@@ -46,6 +46,14 @@ async function loadFonts() {
   }
 }
 
+async function loadTypekit(doc, id) {
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = `https://use.typekit.net/${id}.css`;
+  const head = doc.querySelector('head');
+  head.append(link);
+}
+
 function autolinkModals(doc) {
   doc.addEventListener('click', async (e) => {
     const origin = e.target.closest('a');
@@ -152,7 +160,7 @@ async function loadEager(doc) {
     doc.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
   }
-
+  loadTypekit(doc, 'bdy4rib');
   sampleRUM.enhance();
 
   try {
