@@ -46,7 +46,7 @@ async function loadFonts() {
   }
 }
 
-async function loadTypekit(doc, id) {  
+async function loadTypekit(doc, id) {
   const link = document.createElement('link');
   link.rel = 'stylesheet';
   link.href = `https://use.typekit.net/${id}.css`;
