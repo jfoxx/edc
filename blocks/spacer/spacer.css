@@ -1,0 +1,8 @@
+.spacer {
+    margin: 40px 0;
+    
+    &.border {
+        background-color: var(--color-light-gray);
+        height: 1px;
+    }
+}

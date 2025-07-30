@@ -17,9 +17,11 @@
   --dark-color: #505050;
   --text-color: #131313;
   --link-color: var(--color-blue);
-  --link-hover-color: #1d3ecf;
+  --link-hover-color: #004a95; ;
   --color-blue: #1a65b2;
   --color-red: #800001;
+  --color-teal: #31b0ba;
+  --color-light-gray: #d1d1d1;
 
   /* fonts */
   --body-font-family: 'noto-sans', roboto, roboto-fallback, sans-serif;
@@ -42,6 +44,9 @@
   --nav-height: 64px;
   --breadcrumbs-height: 34px;
   --header-height: var(--nav-height);
+
+  /* misc */
+  --button-border-radius: 8px;
 }
 
 /* fallback fonts */
@@ -183,7 +188,7 @@ button {
   max-width: 100%;
   margin: 12px 0;
   border: 2px solid transparent;
-  border-radius: 2.4em;
+  border-radius: var(--button-border-radius);
   padding: 0.5em 1.2em;
   font-family: var(--body-font-family);
   font-style: normal;
@@ -263,4 +268,109 @@ main .section.highlight {
   background-color: var(--light-color);
   margin: 0;
   padding: 40px 0;
+}
+
+main .section[data-border] > div {
+  border: 1px solid var(--color-light-gray);
+  border-radius: 1pc;
+}
+
+main .section[data-align="center"] > div {
+  text-align: center;
+}
+
+main .section[data-align="right"] > div {
+  text-align: right;
+}
+
+main .section[data-align="left"] > div {
+  text-align: left;
+}
+
+/* Section Columns */
+/*  stylelint-disable no-descending-specificity */
+
+@media (width >= 900px ) {
+  main .section[data-layout] .layout-wrapper {
+    flex-direction: row;
+    display: flex;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  main .section[data-layout="50/50"] .layout-wrapper > div {
+    flex: 0 1 50%;
+  }
+  
+  main .section[data-layout="40/60"] .layout-wrapper > div {
+    flex: 0 1 60%;
+
+    &:first-of-type {
+      flex: 0 1 calc(40% - 20px);
+      margin-right: 20px;
+    }
+  }
+  
+  main .section[data-layout="60/40"] .layout-wrapper > div {
+    flex: 0 1 40%;
+
+    &:first-of-type {
+      flex: 0 1 calc(60% - 20px);
+      margin-right: 20px;
+    }
+  }
+
+  main .section[data-layout="70/30"] .layout-wrapper > div {
+    flex: 0 1 30%;
+
+    &:first-of-type {
+      flex: 0 1 calc(70% - 20px);
+      margin-right: 20px;
+    }
+  }
+
+  main .section[data-layout="30/70"] .layout-wrapper > div {
+    flex: 0 1 70%;
+
+    &:first-of-type {
+      flex: 0 1 calc(30% - 20px);
+      margin-right: 20px;
+    }
+  }
+  
+  main .section[data-layout="25/75"] .layout-wrapper > div {
+    flex: 0 1 75%;
+
+    &:first-of-type {
+      flex: 0 1 calc(25% - 20px);
+      margin-right: 20px;
+    }
+  }
+  
+  main .section[data-layout="75/25"] .layout-wrapper > div {
+    flex: 0 1 25%;
+
+    &:last-of-type {
+      flex: 0 1 calc(75% - 20px);
+      margin-right: 20px;
+    }
+  }
+
+  main .section[data-layout="80/20"] .layout-wrapper > div {
+    flex: 0 1 20%;
+
+    &:first-of-type {
+      flex: 0 1 calc(80% - 20px);
+      margin-right: 20px;
+    }
+  }
+
+  main .section[data-layout="20/80"] .layout-wrapper > div {
+    flex: 0 1 80%;
+
+    &:first-of-type {
+      flex: 0 1 calc(20% - 20px);
+      margin-right: 20px;
+    }
+  }
 }
