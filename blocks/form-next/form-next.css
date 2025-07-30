@@ -1,0 +1,50 @@
+.form-next-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100%;
+    background-color: var(--color-blue);
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -40px;
+        left: 20px;
+        width: 180px;
+        height: 110px;
+        mask-image: url('/icons/energy-accent.svg');
+        mask-size: cover;
+        mask-repeat: no-repeat;
+        background-color: var(--color-teal);
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: -40px;
+        right: 20px;
+        width: 180px;
+        height: 110px;
+        mask-image: url('/icons/energy-accent.svg');
+        mask-size: cover;
+        mask-repeat: no-repeat;
+        background-color: var(--color-teal);
+    }
+}
+
+.form-next {
+    color: white;
+    padding: 2rem;
+    min-height: 100%;
+    text-align: center;
+
+    > div {
+        display: flex;
+        flex-direction: column;
+
+        > div:last-of-type {
+            display: none;
+        }
+    }
+}
