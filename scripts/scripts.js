@@ -204,9 +204,9 @@ let atjsPromise = Promise.resolve();
 if (getMetadata('target')) {
   // eslint-disable-next-line no-unused-vars
   atjsPromise = initATJS('./at.js', {
-    clientCode: 'demoonecloud',
-    serverDomain: 'demoonecloud.tt.omtrdc.net',
-    imsOrgId: 'E4961D746578144C0A495FC6@AdobeOrg',
+    clientCode: 'foxx',
+    serverDomain: 'foxx.tt.omtrdc.net',
+    imsOrgId: '4009236F6182AB170A495EC3@AdobeOrg',
     bodyHidingEnabled: false,
     cookieDomain: window.location.hostname,
     pageLoadEnabled: false,

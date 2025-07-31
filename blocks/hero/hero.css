@@ -6,6 +6,10 @@
   padding: 2rem 0;
   position: relative;
 
+  h1, h2 {
+    color: white;
+  }
+
   .hero-image {
     position: absolute;
     top: 0;
@@ -80,3 +84,4 @@
   }
  
 }
+
