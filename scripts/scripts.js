@@ -29,7 +29,9 @@ function buildHeroBlock(main) {
   // eslint-disable-next-line no-bitwise
   if (h1 && h2 && (h1.compareDocumentPosition(h2) & Node.DOCUMENT_POSITION_FOLLOWING)) {
     const section = document.createElement('div');
-    section.append(buildBlock('hero', { elems: [img, h1, h2] }));
+    const hero = buildBlock('hero', { elems: [img, h1, h2] });
+    section.classList.add('simple-hero');
+    section.append(hero);
     main.prepend(section);
   }
 }
