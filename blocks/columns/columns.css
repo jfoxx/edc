@@ -27,6 +27,31 @@
   }
 }
 
+.columns.large-image > div > div {
+  &:has(img) {
+    grid-template:
+    "image" 300px
+    "headline" auto
+    "content" 1fr
+    / 1fr;
+    }
+
+  h3 {
+    grid-area: headline;
+
+  }  
+
+  p {
+    width: 100%;
+
+    &:has(img) {
+      height: 220px;
+      width: 60%;
+      margin: auto;
+    }
+  }
+}
+
 .columns > div > .columns-img-col {
   order: 0;
 }
@@ -37,7 +62,6 @@
 
 @media (width >= 900px) {
   .columns > div {
-    align-items: center;
     flex-direction: unset;
     gap: 24px;
   }

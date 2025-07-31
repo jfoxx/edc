@@ -17,7 +17,8 @@
   --dark-color: #505050;
   --text-color: #131313;
   --link-color: var(--color-blue);
-  --link-hover-color: #004a95; ;
+  --link-hover-color: #004a95;
+  --color-light-blue: #e5edf7;
   --color-blue: #1a65b2;
   --color-red: #800001;
   --color-teal: #31b0ba;
@@ -125,6 +126,7 @@ h6 {
   font-weight: 600;
   line-height: 1.25;
   scroll-margin: 40px;
+  color: var(--color-blue);
 }
 
 h1 { font-size: var(--heading-font-size-xxl); }
@@ -268,6 +270,17 @@ main .section.highlight {
   background-color: var(--light-color);
   margin: 0;
   padding: 40px 0;
+}
+
+main .section.shaded {
+  background-color: var(--color-light-blue);
+  margin: 0;
+  padding: 40px 0;
+}
+
+main .section.inset {
+  padding-left: 20%;
+  padding-right: 20%;
 }
 
 main .section[data-border] > div {
