@@ -29,7 +29,7 @@ const experimentationConfig = {
     mobile: () => window.innerWidth < 600,
     desktop: () => window.innerWidth >= 600,
     // define your custom audiences here as needed
-  }
+  },
 };
 
 let runExperimentation;
@@ -40,6 +40,7 @@ if (isExperimentationEnabled) {
   ({
     loadEager: runExperimentation,
     loadLazy: showExperimentationOverlay,
+    // eslint-disable-next-line import/no-relative-packages
   } = await import('../plugins/experimentation/src/index.js'));
 }
 
@@ -363,7 +364,7 @@ async function loadLazy(doc) {
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
 
-   if (showExperimentationOverlay) {
+  if (showExperimentationOverlay) {
     await showExperimentationOverlay(document, experimentationConfig);
   }
 }
@@ -416,30 +417,5 @@ export const NX_ORIGIN = branch === 'local' || origin.includes('localhost') ? 'h
   }
   if (searchParams.get('daexperiment')) {
     import(`${NX_ORIGIN}/public/plugins/exp/exp.js`);
-  }
-}());
-
-
-async function loadSidekick() {
-  if (document.querySelector('aem-sidekick')) {
-    import('./sidekick.js');
-    return;
-  }
-
-  document.addEventListener('sidekick-ready', () => {
-    import('./sidekick.js');
-  });
-}
-
-(async function loadDa() {
-  const { searchParams } = new URL(window.location.href);
-
-  /* eslint-disable import/no-unresolved */
-  if (searchParams.get('dapreview')) {
-    import('https://da.live/scripts/dapreview.js')
-      .then(({ default: daPreview }) => daPreview(loadPage));
-  }
-  if (searchParams.get('daexperiment')) {
-    import('https://da.live/nx/public/plugins/exp/exp.js');
   }
 }());
