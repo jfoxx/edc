@@ -1,0 +1,16 @@
+{
+ "mappings": [
+"/content/edc-ue/language-masters/en/:/",
+"/content/edc-ue/configuration:/.helix/config.json",
+"/content/edc-ue/metadata:/metadata.json",
+"/content/edc-ue/redirects:/redirects.json",
+"/content/edc-ue/language-masters/placeholders:/language-masters/placeholders.json",
+"/content/edc-ue/language-masters/en/placeholders:/language-masters/en/placeholders.json",
+"/content/edc-ue/language-masters/en/placeholders:/en/placeholders.json",
+"/content/edc-ue/placeholders:/placeholders.json",
+"/content/edc-ue.resource/language-masters/en/query-index.json:/en/query-index.json"
+],
+"includes": [
+"/content/edc-ue/"
+]
+}
