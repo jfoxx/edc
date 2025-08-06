@@ -1,4 +1,8 @@
 helix-importer-ui
 /blocks/form/*
 scripts/at.js
+scripts/editor-support-rte.js
+scripts/editor-support.js
+scripts/form-editor-support.js
+scripts/form-editor-support.css
 plugins/experimentation/*
