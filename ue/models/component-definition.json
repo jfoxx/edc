@@ -27,6 +27,9 @@
       "components": [
         {
           "...": "./blocks/*.json#/definitions"
+        },
+        {
+          "...": "../../blocks/form/_*.json#/definitions"
         }
       ]
     }

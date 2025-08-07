@@ -48,7 +48,9 @@
         "tabs",
         "table",
         "text",
-        "video"
+        "video",
+        "form",
+        "embed-adaptive-form"
       ]
     }
   ]
