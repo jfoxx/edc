@@ -33,7 +33,8 @@
                             "component": "aem-content",
                             "name": "fragmentPath",
                             "label": "Fragment reference",
-                            "valueType": "string"
+                            "valueType": "string",
+                            "rootPath" : "/content/forms/af/edc"
                         }
                     ]
                 },
