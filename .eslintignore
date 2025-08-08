@@ -6,3 +6,4 @@ scripts/editor-support.js
 scripts/form-editor-support.js
 scripts/form-editor-support.css
 plugins/experimentation/*
+tools/copy-url-plugin.js
