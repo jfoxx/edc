@@ -80,6 +80,15 @@
               "valueType": "string",
               "condition": { "==": [{ "var": "actionType" }, "fd/af/components/guidesubmittype/restendpoint"] }
           },
+           {
+              "component": "reference",
+              "valueType": "string",
+              "name": "asset",
+              "label": "Asset",
+              "multi": false,
+              "condition": { "==": [{ "var": "actionType" }, "fd/af/components/guidesubmittype/restendpoint"] }
+
+            },
           {
               "condition": { "==": [{ "var": "actionType" }, "spreadsheet"] },
               "component": "text",
