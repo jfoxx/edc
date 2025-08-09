@@ -62,6 +62,10 @@
                   {
                       "name": "Persist to Spreadsheet",
                       "value": "spreadsheet"
+                  },
+                  {
+                      "name": "Deliver Asset",
+                      "value": "fd/af/components/guidesubmittype/deliverasset"
                   }
               ],
               "value" : ""
@@ -86,7 +90,7 @@
               "name": "asset",
               "label": "Asset",
               "multi": false,
-              "condition": { "==": [{ "var": "actionType" }, "fd/af/components/guidesubmittype/restendpoint"] }
+              "condition": { "==": [{ "var": "actionType" }, "fd/af/components/guidesubmittype/assetdelivery"] }
 
             },
           {
