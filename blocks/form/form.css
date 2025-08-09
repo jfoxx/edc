@@ -423,7 +423,7 @@ main .form button {
     border: var(--form-button-border);
     padding: var(--form-button-padding);
     font-size: var(--form-button-font-size);
-    border-radius: unset;
+    border-radius: 8px;
     width: 100%;
 }
 
@@ -523,7 +523,7 @@ main .form .button-wrapper button {
 main .form .button-wrapper button:hover {
     border: 3px solid var(#fff);
     color: #fff;
-    background-color: var(--button-secondary-color);
+    background-color: var(--form-button-background-hover-color);
 }
 
 main .form .button-wrapper button[disabled] {

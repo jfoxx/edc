@@ -1,10 +1,13 @@
 .accordion details {
-  border: 1px solid #dadada;
+  border: 1px solid var(--color-blue);
+  background-color: var(--color-light-blue);
+  color: var(--color-blue);
+  font-weight: bold;
 }
 
 /* stylelint-disable-next-line no-descending-specificity */
 .accordion details + details {
-  margin-top: 24px;
+  margin-top: 10px;
 }
 
 .accordion details p {
@@ -22,12 +25,12 @@
 }
 
 .accordion details[open] summary {
-  background-color: var(--light-color);
+  background-color: var(--color-light-blue);
 }
 
 .accordion details summary:focus,
 .accordion details summary:hover {
-  background-color: var(--light-color);
+  background-color: var(--color-light-blue);
 }
 
 .accordion details summary::-webkit-details-marker {
@@ -56,6 +59,8 @@
 }
 
 .accordion details[open] .accordion-item-body {
-  border-top: 1px solid #dadada;
-  background-color: var(--background-color);
+  background-color: var(--color-light-blue);
+  color: var(--text-color);
+  font-weight: normal;
+  font-size: var(--body-font-size-s);
 }
