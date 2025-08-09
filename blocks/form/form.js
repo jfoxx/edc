@@ -450,7 +450,7 @@ export async function fetchForm(pathname) {
 }
 
 export default async function decorate(block) {
-  let container = block.querySelector('p');
+  let container = block.querySelector('a[href]');
   let formDef;
   let pathname;
   if (container) {
