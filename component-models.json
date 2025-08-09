@@ -299,6 +299,10 @@
           {
             "name": "Persist to Spreadsheet",
             "value": "spreadsheet"
+          },
+          {
+            "name": "Deliver Asset",
+            "value": "fd/af/components/guidesubmittype/deliverasset"
           }
         ],
         "value": ""
@@ -328,6 +332,21 @@
               "var": "actionType"
             },
             "fd/af/components/guidesubmittype/restendpoint"
+          ]
+        }
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "asset",
+        "label": "Asset",
+        "multi": false,
+        "condition": {
+          "==": [
+            {
+              "var": "actionType"
+            },
+            "fd/af/components/guidesubmittype/assetdelivery"
           ]
         }
       },
@@ -2083,7 +2102,8 @@
             "component": "aem-content",
             "name": "fragmentPath",
             "label": "Fragment reference",
-            "valueType": "string"
+            "valueType": "string",
+            "rootPath": "/content/forms/af/edc"
           }
         ]
       },
