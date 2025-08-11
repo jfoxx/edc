@@ -166,7 +166,6 @@ main .form select {
     background-color: var(--form-input-background-color);
     border: var(--form-input-border-size) solid var(--form-input-border-color);
     width: 100%;
-    height: 42px;
     color: var(--form-label-color);
     padding: var(--form-input-padding);
     font-size: var(--form-input-font-size);
