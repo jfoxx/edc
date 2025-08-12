@@ -22,6 +22,7 @@ import {
   createRadioOrCheckbox,
   createInput,
 } from './util.js';
+import { openAsset } from './asset.js'; // Importing openAsset function to handle asset opening
 
 export const DELAY_MS = 0;
 let captchaField;
@@ -449,8 +450,16 @@ export async function fetchForm(pathname) {
   return data;
 }
 
+let deliverableAsset = null;
+
 export default async function decorate(block) {
   let container = block.querySelector('a[href]');
+  if (block.classList.contains('asset-delivery')) { 
+    // If the block is an asset delivery block, we need to handle it differently 
+    let asset = block.querySelector('a[href$=".pdf"]');
+    if (asset) {
+      deliverableAsset = asset.href;    }
+  }
   let formDef;
   let pathname;
   if (container) {
@@ -502,5 +511,22 @@ export default async function decorate(block) {
       form.dataset.formpath = formDef.properties['fd:path'];
     }
     container.replaceWith(form);
+
+    if (block.classList.contains('asset-delivery')) { 
+      console.log('Asset delivery block detected, setting up asset download functionality');
+      const submitButton = form.querySelector('button[name="submit"]');
+      console.log('Submit button found:', submitButton);
+      if (submitButton && deliverableAsset) {
+        submitButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          openAsset(deliverableAsset);
+          console.log('Asset opened:', deliverableAsset);
+          const message = document.createElement('h3');
+          message.textContent = 'Thank you for registering, your asset has downloaded.'
+          form.replaceWith(message);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+    }
   }
 }
