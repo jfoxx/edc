@@ -150,7 +150,47 @@ export default async function decorate(block) {
   const navSections = nav.querySelector('.nav-sections');
   if (navSections) {
     navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
-      if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
+      const dropdownMenu = navSection.querySelector('ul');
+      if (dropdownMenu) {
+        navSection.classList.add('nav-drop');
+
+        // Get the nav item title text
+        const navTitle = navSection.querySelector(':scope > p')?.textContent?.trim() || '';
+
+        // Check for description in the first item (look for em/italic text)
+        const firstItem = dropdownMenu.querySelector(':scope > li:first-child');
+        let description = '';
+        const emElement = firstItem?.querySelector('em');
+        if (emElement) {
+          description = emElement.textContent.trim();
+          // Remove the em element or the entire first li if it only contains the description
+          if (firstItem.textContent.trim() === description) {
+            firstItem.remove();
+          } else {
+            emElement.remove();
+          }
+        }
+
+        // Create mega menu structure
+        const megaMenuIntro = document.createElement('div');
+        megaMenuIntro.className = 'mega-menu-intro';
+        megaMenuIntro.innerHTML = `
+          <h2>${navTitle}</h2>
+          <p class="mega-menu-description">${description || ''}</p>
+        `;
+
+        // Wrap existing menu items in a container
+        const megaMenuItems = document.createElement('div');
+        megaMenuItems.className = 'mega-menu-items';
+        while (dropdownMenu.firstChild) {
+          megaMenuItems.appendChild(dropdownMenu.firstChild);
+        }
+
+        // Add the new structure to the dropdown
+        dropdownMenu.appendChild(megaMenuIntro);
+        dropdownMenu.appendChild(megaMenuItems);
+      }
+
       navSection.addEventListener('click', () => {
         if (isDesktop.matches) {
           const expanded = navSection.getAttribute('aria-expanded') === 'true';

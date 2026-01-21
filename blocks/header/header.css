@@ -373,7 +373,7 @@ header .nav-sections > .default-content-wrapper > ul > li.nav-drop[aria-expanded
 header .nav-sections > .default-content-wrapper > ul > li > ul {
   display: none;
   position: fixed;
-  top: calc(var(--nav-utility-height) + var(--nav-main-height));
+  top: 84px;
   left: 0;
   right: 0;
   width: 100vw;
@@ -381,11 +381,9 @@ header .nav-sections > .default-content-wrapper > ul > li > ul {
   border-top: 1px solid var(--nav-border-color);
   border-bottom: 1px solid var(--nav-border-color);
   box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
-  padding: 24px 32px;
+  padding: 32px;
   z-index: 100;
   flex-direction: row;
-  flex-wrap: wrap;
-  gap: 16px 48px;
   list-style: none;
   max-width: 100%;
   box-sizing: border-box;
@@ -395,15 +393,48 @@ header .nav-sections > .default-content-wrapper > ul > li.nav-drop[aria-expanded
   display: flex;
 }
 
-header .nav-sections > .default-content-wrapper > ul > li > ul > li {
+/* Mega menu intro section (1/3 width) */
+header .nav-sections .mega-menu-intro {
+  flex: 0 0 30%;
+  padding: 32px;
+  margin: -32px 0 -32px -32px;
+  background-color: rgb(245 245 245);
+}
+
+header .nav-sections .mega-menu-intro h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--nav-blue);
+  margin: 0 0 16px;
+  line-height: 1.3;
+}
+
+header .nav-sections .mega-menu-intro .mega-menu-description {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--nav-text-color);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Mega menu items section (2/3 width, 2 columns) */
+header .nav-sections .mega-menu-items {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px 48px;
+  padding-left: 48px;
+}
+
+header .nav-sections .mega-menu-items > li {
   display: block;
   border: none;
   padding: 0;
   height: auto;
-  min-width: 200px;
+  min-width: 0;
 }
 
-header .nav-sections > .default-content-wrapper > ul > li > ul > li > p {
+header .nav-sections .mega-menu-items > li > p {
   font-size: 15px;
   font-weight: 600;
   color: var(--nav-blue);
@@ -411,7 +442,7 @@ header .nav-sections > .default-content-wrapper > ul > li > ul > li > p {
   padding: 0;
 }
 
-header .nav-sections > .default-content-wrapper > ul > li > ul > li > a {
+header .nav-sections .mega-menu-items > li > a {
   display: block;
   padding: 6px 0;
   font-size: 14px;
@@ -420,18 +451,18 @@ header .nav-sections > .default-content-wrapper > ul > li > ul > li > a {
   transition: all 0.15s ease;
 }
 
-header .nav-sections > .default-content-wrapper > ul > li > ul > li > a:hover {
+header .nav-sections .mega-menu-items > li > a:hover {
   color: var(--nav-blue);
 }
 
 /* Nested lists in mega menu */
-header .nav-sections > .default-content-wrapper > ul > li > ul > li > ul {
+header .nav-sections .mega-menu-items > li > ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-header .nav-sections > .default-content-wrapper > ul > li > ul > li > ul > li {
+header .nav-sections .mega-menu-items > li > ul > li {
   padding: 4px 0;
   font-size: 14px;
   color: var(--nav-text-color);
@@ -439,7 +470,7 @@ header .nav-sections > .default-content-wrapper > ul > li > ul > li > ul > li {
   min-width: auto;
 }
 
-header .nav-sections > .default-content-wrapper > ul > li > ul > li > ul > li:hover {
+header .nav-sections .mega-menu-items > li > ul > li:hover {
   color: var(--nav-blue);
 }
 
