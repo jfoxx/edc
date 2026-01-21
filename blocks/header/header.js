@@ -104,6 +104,21 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
 }
 
 /**
+ * Creates the hamburger menu button for mobile navigation
+ * @returns {Element} The hamburger button element
+ */
+function createHamburgerButton() {
+  const hamburger = document.createElement('div');
+  hamburger.className = 'nav-hamburger';
+  hamburger.innerHTML = `
+    <button type="button" aria-controls="nav" aria-label="Open navigation">
+      <span class="nav-hamburger-icon"></span>
+    </button>
+  `;
+  return hamburger;
+}
+
+/**
  * loads and decorates the header, mainly the nav
  * @param {Element} block The header block element
  */
@@ -126,7 +141,7 @@ export default async function decorate(block) {
   });
 
   const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
+  const brandLink = navBrand?.querySelector('.button');
   if (brandLink) {
     brandLink.className = '';
     brandLink.closest('.button-container').className = '';
@@ -145,6 +160,61 @@ export default async function decorate(block) {
       });
     });
   }
+
+  // Create utility row wrapper (brand + tools)
+  const navTools = nav.querySelector('.nav-tools');
+
+  // Handle utility nav links
+  if (navTools) {
+    // First, convert strong-wrapped links to CTA buttons and remove strong tag
+    navTools.querySelectorAll('strong > a').forEach((link) => {
+      const strong = link.parentElement;
+      const parent = strong.parentElement;
+      link.classList.add('nav-cta');
+      parent.classList.add('nav-cta-container');
+      // Replace strong with just the link
+      strong.replaceWith(link);
+    });
+
+    // Remove default .button class from all links in nav-tools (they get auto-decorated)
+    navTools.querySelectorAll('a.button').forEach((link) => {
+      link.classList.remove('button');
+      const parent = link.closest('.button-container');
+      if (parent) {
+        parent.classList.remove('button-container');
+      }
+    });
+  }
+
+  const utilityRow = document.createElement('div');
+  utilityRow.className = 'nav-utility-row';
+
+  // Move brand and tools into utility row
+  if (navBrand) {
+    utilityRow.appendChild(navBrand);
+  }
+
+  // Add hamburger menu for mobile
+  const hamburger = createHamburgerButton();
+  hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
+
+  if (navTools) {
+    utilityRow.appendChild(navTools);
+  }
+
+  utilityRow.appendChild(hamburger);
+
+  // Build nav structure: utility row on top, sections below
+  const navContent = document.createElement('div');
+  navContent.className = 'nav-content';
+  navContent.appendChild(utilityRow);
+  if (navSections) {
+    navContent.appendChild(navSections);
+  }
+
+  // Clear and rebuild nav
+  nav.innerHTML = '';
+  nav.appendChild(navContent);
 
   const navWrapper = document.createElement('div');
   navWrapper.className = 'nav-wrapper';

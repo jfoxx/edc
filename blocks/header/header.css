@@ -1,38 +1,46 @@
-/* header and nav layout */
+/* EDC-style header and nav layout */
+
+/* ========================================
+   CSS Custom Properties for Navigation
+   ======================================== */
 header .nav-wrapper {
-  background-color: var(--background-color);
+  --nav-utility-height: 52px;
+  --nav-main-height: 52px;
+  --nav-total-height: calc(var(--nav-utility-height) + var(--nav-main-height));
+  --nav-text-color: #333;
+  --nav-blue: #1a65b2;
+  --nav-blue-dark: #004a95;
+  --nav-border-color: #e5e5e5;
+  --nav-font-family: 'noto-sans', roboto, sans-serif;
+
+  background-color: #fff;
   width: 100%;
-  z-index: 2;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+  position: sticky;
+  top: 0;
 }
 
+/* ========================================
+   Main Navigation Container
+   ======================================== */
 header nav {
   box-sizing: border-box;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0 24px;
-  margin: auto;
-  max-width: 1248px;
-  height: var(--nav-height);
+  flex-direction: column;
+  margin: 0 auto;
+  max-width: 1280px;
   padding: 0 24px;
-  font-family: var(--body-font-family);
+  font-family: var(--nav-font-family);
 }
 
 header nav[aria-expanded='true'] {
-  grid-template:
-    'hamburger brand' var(--nav-height)
-    'sections sections' 1fr
-    'tools tools' var(--nav-height) / auto 1fr;
-  overflow-y: auto;
   min-height: 100dvh;
+  overflow-y: auto;
 }
 
 @media (width >= 900px) {
   header nav {
-    display: flex;
-    justify-content: space-between;
-    gap: 0 32px;
-    max-width: 1264px;
     padding: 0 32px;
   }
 
@@ -44,76 +52,569 @@ header nav[aria-expanded='true'] {
 
 header nav p {
   margin: 0;
-  
-  /* line-height: 1; BOILERPLATE DOESN'T HAVE a P tag in header, */
-}
-
-header nav a:any-link {
-  color: currentcolor;
-}
-
-
-/* brand */
-header .nav-brand {
-  grid-area: brand;
-  flex-basis: 128px;
-  font-size: var(--heading-font-size-s);
-  font-weight: 700;
   line-height: 1;
 }
 
+header nav a:any-link {
+  color: var(--nav-text-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+header nav a:any-link:hover {
+  color: var(--nav-blue);
+  text-decoration: none;
+}
+
+/* ========================================
+   Nav Content Wrapper
+   ======================================== */
+.nav-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========================================
+   Top Row: Brand + Utility Bar
+   ======================================== */
+.nav-utility-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--nav-utility-height);
+}
+
+/* ========================================
+   Brand / Logo
+   ======================================== */
+header .nav-brand {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+
+header .nav-brand a {
+  display: flex;
+  align-items: center;
+}
+
+header .nav-brand p {
+  margin: 0;
+}
+
 header nav .nav-brand img {
-  width: 128px;
+  width: 90px;
   height: auto;
 }
 
-header nav .nav-sections {
-  ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 60px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-
-    li {
-      border-right: 1px solid black;
-      padding-right: 60px;
-      height: 40px;
-      align-items: center;
-      display: flex;
-      justify-content: center;
-
-      &:last-of-type {
-        border-right: none;
-        padding-right: 0;
-      }
-
-      a {
-        border: 2px solid #3d3d3d;
-        border-radius: 8px;
-        min-width: 4pc;
-        min-height: 40px;
-        line-height: 24px;
-        padding: .25rem 1rem;
-        cursor: pointer;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center ;
-
-        &:hover {
-          background-color: #3d3d3d;
-          color: white;
-          text-decoration: none;
-        }
-      }
-    }
+@media (width >= 900px) {
+  header nav .nav-brand img {
+    width: 110px;
   }
 }
 
-/* stylelint-disable-next-line no-descending-specificity */
+/* ========================================
+   Utility Navigation (Search, Lang, Login, Contact)
+   ======================================== */
+header .nav-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+header .nav-tools .default-content-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+header .nav-tools > .default-content-wrapper > ul {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+header .nav-tools > .default-content-wrapper > ul > li {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+header .nav-tools > .default-content-wrapper > ul > li > p {
+  margin: 0;
+}
+
+header .nav-tools > .default-content-wrapper > ul > li > p,
+header .nav-tools > .default-content-wrapper > ul > li > p > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--nav-text-color);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+header .nav-tools > .default-content-wrapper > ul > li > p:hover,
+header .nav-tools > .default-content-wrapper > ul > li > p > a:hover {
+  color: var(--nav-blue);
+}
+
+/* Hide nested dropdowns in utility bar by default */
+header .nav-tools > .default-content-wrapper > ul > li > ul {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  min-width: 220px;
+  background: #fff;
+  border: 1px solid var(--nav-border-color);
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
+  padding: 12px 0;
+  z-index: 100;
+  list-style: none;
+  flex-direction: column;
+}
+
+header .nav-tools > .default-content-wrapper > ul > li:hover > ul {
+  display: flex;
+}
+
+header .nav-tools > .default-content-wrapper > ul > li > ul > li {
+  display: block;
+  padding: 0;
+}
+
+header .nav-tools > .default-content-wrapper > ul > li > ul > li > p {
+  display: block;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--nav-text-color);
+  margin: 0;
+}
+
+/* Nested sub-dropdowns */
+header .nav-tools > .default-content-wrapper > ul > li > ul > li > ul {
+  list-style: none;
+  padding: 0 0 8px 20px;
+  margin: 0;
+}
+
+header .nav-tools > .default-content-wrapper > ul > li > ul > li > ul > li {
+  padding: 6px 20px;
+  font-size: 13px;
+  color: #666;
+  cursor: pointer;
+}
+
+header .nav-tools > .default-content-wrapper > ul > li > ul > li > ul > li:hover {
+  color: var(--nav-blue);
+}
+
+/* Search icon/button styling */
+header .nav-tools > .default-content-wrapper > ul > li:first-child > p {
+  gap: 8px;
+}
+
+header .nav-tools .icon-search {
+  width: 18px;
+  height: 18px;
+}
+
+/* Login dropdown indicator */
+header .nav-tools > .default-content-wrapper > ul > li:has(> ul)::after {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-left: -8px;
+  margin-right: 8px;
+  pointer-events: none;
+  background-color: var(--nav-text-color);
+  mask-image: url('/icons/chevron-down-solid-full.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-image: url('/icons/chevron-down-solid-full.svg');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+/* CTA button style for links wrapped in <strong> (now marked with .nav-cta class) */
+header .nav-wrapper .nav-tools .nav-cta-container {
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+header .nav-wrapper .nav-tools a.nav-cta {
+  background-color: var(--nav-blue);
+  border: 1px solid var(--nav-blue);
+  border-radius: 4px;
+  padding: 8px 20px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #fff;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  white-space: nowrap;
+}
+
+header .nav-wrapper .nav-tools a.nav-cta:hover {
+  background-color: var(--nav-blue-dark);
+  border-color: var(--nav-blue-dark);
+  color: #fff;
+}
+
+/* Search icon styling */
+header .nav-tools > .default-content-wrapper > ul > li:first-child > p::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  background-image: url('/icons/search.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* ========================================
+   Main Navigation Menu
+   ======================================== */
+header .nav-sections {
+  display: flex;
+  align-items: center;
+  height: var(--nav-main-height);
+}
+
+header .nav-sections .default-content-wrapper {
+  width: 100%;
+}
+
+header .nav-sections > .default-content-wrapper > ul {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  justify-content: flex-end;
+}
+
+/* Last nav item ends flush with the right edge */
+header .nav-sections > .default-content-wrapper > ul > li:last-child > p {
+  padding-right: 0;
+}
+
+header .nav-sections > .default-content-wrapper > ul > li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--nav-main-height);
+}
+
+header .nav-sections > .default-content-wrapper > ul > li > p {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--nav-blue);
+  cursor: pointer;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+  margin: 0;
+}
+
+header .nav-sections > .default-content-wrapper > ul > li > p:hover,
+header .nav-sections > .default-content-wrapper > ul > li:hover > p {
+  color: var(--nav-blue-dark);
+}
+
+/* Dropdown chevron indicator for nav-drop items */
+header .nav-sections > .default-content-wrapper > ul > li.nav-drop > p::after {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-left: 6px;
+  transition: transform 0.2s ease;
+  background-color: #666;
+  mask-image: url('/icons/chevron-down-solid-full.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-image: url('/icons/chevron-down-solid-full.svg');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+header .nav-sections > .default-content-wrapper > ul > li.nav-drop[aria-expanded='true'] > p::after {
+  transform: rotate(180deg);
+}
+
+/* Dropdown menu panel - full width mega menu */
+header .nav-sections > .default-content-wrapper > ul > li > ul {
+  display: none;
+  position: fixed;
+  top: calc(var(--nav-utility-height) + var(--nav-main-height));
+  left: 0;
+  right: 0;
+  width: 100vw;
+  background: #fff;
+  border-top: 1px solid var(--nav-border-color);
+  border-bottom: 1px solid var(--nav-border-color);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
+  padding: 24px 32px;
+  z-index: 100;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 16px 48px;
+  list-style: none;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+header .nav-sections > .default-content-wrapper > ul > li.nav-drop[aria-expanded='true'] > ul {
+  display: flex;
+}
+
+header .nav-sections > .default-content-wrapper > ul > li > ul > li {
+  display: block;
+  border: none;
+  padding: 0;
+  height: auto;
+  min-width: 200px;
+}
+
+header .nav-sections > .default-content-wrapper > ul > li > ul > li > p {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--nav-blue);
+  margin: 0 0 8px;
+  padding: 0;
+}
+
+header .nav-sections > .default-content-wrapper > ul > li > ul > li > a {
+  display: block;
+  padding: 6px 0;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--nav-text-color);
+  transition: all 0.15s ease;
+}
+
+header .nav-sections > .default-content-wrapper > ul > li > ul > li > a:hover {
+  color: var(--nav-blue);
+}
+
+/* Nested lists in mega menu */
+header .nav-sections > .default-content-wrapper > ul > li > ul > li > ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+header .nav-sections > .default-content-wrapper > ul > li > ul > li > ul > li {
+  padding: 4px 0;
+  font-size: 14px;
+  color: var(--nav-text-color);
+  cursor: pointer;
+  min-width: auto;
+}
+
+header .nav-sections > .default-content-wrapper > ul > li > ul > li > ul > li:hover {
+  color: var(--nav-blue);
+}
+
+/* ========================================
+   Mobile Navigation Hamburger
+   ======================================== */
+header .nav-hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+}
+
+header .nav-hamburger button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+header .nav-hamburger-icon,
+header .nav-hamburger-icon::before,
+header .nav-hamburger-icon::after {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background-color: var(--nav-text-color);
+  border-radius: 2px;
+  transition: transform 0.2s ease;
+}
+
+header .nav-hamburger-icon {
+  position: relative;
+}
+
+header .nav-hamburger-icon::before,
+header .nav-hamburger-icon::after {
+  content: '';
+  position: absolute;
+  left: 0;
+}
+
+header .nav-hamburger-icon::before {
+  top: -7px;
+}
+
+header .nav-hamburger-icon::after {
+  top: 7px;
+}
+
+/* Hamburger animation when open */
+header nav[aria-expanded='true'] .nav-hamburger-icon {
+  background-color: transparent;
+}
+
+header nav[aria-expanded='true'] .nav-hamburger-icon::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+header nav[aria-expanded='true'] .nav-hamburger-icon::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+
+/* ========================================
+   Mobile Styles (< 900px)
+   ======================================== */
+@media (width < 900px) {
+  header .nav-wrapper {
+    --nav-utility-height: 60px;
+  }
+
+  .nav-utility-row {
+    height: var(--nav-utility-height);
+  }
+
+  header .nav-brand {
+    order: 1;
+  }
+
+  header .nav-hamburger {
+    order: 3;
+    display: flex;
+  }
+
+  header .nav-tools {
+    order: 2;
+    flex: 1;
+    justify-content: flex-end;
+    padding-right: 8px;
+  }
+
+  /* Hide some utility items on mobile - only show search and contact */
+  header .nav-tools > .default-content-wrapper > ul > li:nth-child(2),
+  header .nav-tools > .default-content-wrapper > ul > li:nth-child(3) {
+    display: none;
+  }
+
+  header .nav-sections {
+    display: none;
+    width: 100%;
+    height: auto;
+    padding: 16px 0;
+    border-top: 1px solid var(--nav-border-color);
+  }
+
+  header nav[aria-expanded='true'] .nav-sections {
+    display: block;
+  }
+
+  header .nav-sections > .default-content-wrapper > ul {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  header .nav-sections > .default-content-wrapper > ul > li {
+    height: auto;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  header .nav-sections > .default-content-wrapper > ul > li > p {
+    padding: 14px 0;
+    font-size: 16px;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--nav-border-color);
+  }
+
+  header .nav-sections > .default-content-wrapper > ul > li.nav-drop > p::after {
+    margin-left: auto;
+  }
+
+  header .nav-sections > .default-content-wrapper > ul > li > ul {
+    position: static;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    padding-left: 20px;
+    background: #f8f9fa;
+  }
+
+  header .nav-sections > .default-content-wrapper > ul > li > ul > li > a {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--nav-border-color);
+  }
+}
+
+/* ========================================
+   Desktop Styles (>= 900px)
+   ======================================== */
+@media (width >= 900px) {
+  header .nav-hamburger {
+    display: none;
+  }
+
+  header nav {
+    height: auto;
+  }
+}
+
+/* ========================================
+   Breadcrumbs
+   ======================================== */
 header .breadcrumbs ol li[aria-current] {
-  color: var(--text-color);
+  color: var(--nav-text-color);
 }
 
 @media (width >= 900px) {
@@ -121,24 +622,5 @@ header .breadcrumbs ol li[aria-current] {
     display: block;
     max-width: 1264px;
     padding: 0 32px;
-  }
-}
-
-@media (width < 800px) {
-  header nav .nav-brand {
-    flex-basis: 80px;
-
-    img {
-      width: 80px;
-      height: auto;
-    }
-  }
-  
-  header .nav-sections {
-    ul {
-      li:first-of-type {
-        display: none;
-      }
-    }
   }
 }
