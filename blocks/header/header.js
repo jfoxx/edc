@@ -104,6 +104,21 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
 }
 
 /**
+ * Creates the hamburger menu button for mobile navigation
+ * @returns {Element} The hamburger button element
+ */
+function createHamburgerButton() {
+  const hamburger = document.createElement('div');
+  hamburger.className = 'nav-hamburger';
+  hamburger.innerHTML = `
+    <button type="button" aria-controls="nav" aria-label="Open navigation">
+      <span class="nav-hamburger-icon"></span>
+    </button>
+  `;
+  return hamburger;
+}
+
+/**
  * loads and decorates the header, mainly the nav
  * @param {Element} block The header block element
  */
@@ -126,7 +141,7 @@ export default async function decorate(block) {
   });
 
   const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
+  const brandLink = navBrand?.querySelector('.button');
   if (brandLink) {
     brandLink.className = '';
     brandLink.closest('.button-container').className = '';
@@ -135,7 +150,47 @@ export default async function decorate(block) {
   const navSections = nav.querySelector('.nav-sections');
   if (navSections) {
     navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
-      if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
+      const dropdownMenu = navSection.querySelector('ul');
+      if (dropdownMenu) {
+        navSection.classList.add('nav-drop');
+
+        // Get the nav item title text
+        const navTitle = navSection.querySelector(':scope > p')?.textContent?.trim() || '';
+
+        // Check for description in the first item (look for em/italic text)
+        const firstItem = dropdownMenu.querySelector(':scope > li:first-child');
+        let description = '';
+        const emElement = firstItem?.querySelector('em');
+        if (emElement) {
+          description = emElement.textContent.trim();
+          // Remove the em element or the entire first li if it only contains the description
+          if (firstItem.textContent.trim() === description) {
+            firstItem.remove();
+          } else {
+            emElement.remove();
+          }
+        }
+
+        // Create mega menu structure
+        const megaMenuIntro = document.createElement('div');
+        megaMenuIntro.className = 'mega-menu-intro';
+        megaMenuIntro.innerHTML = `
+          <h2>${navTitle}</h2>
+          <p class="mega-menu-description">${description || ''}</p>
+        `;
+
+        // Wrap existing menu items in a container
+        const megaMenuItems = document.createElement('div');
+        megaMenuItems.className = 'mega-menu-items';
+        while (dropdownMenu.firstChild) {
+          megaMenuItems.appendChild(dropdownMenu.firstChild);
+        }
+
+        // Add the new structure to the dropdown
+        dropdownMenu.appendChild(megaMenuIntro);
+        dropdownMenu.appendChild(megaMenuItems);
+      }
+
       navSection.addEventListener('click', () => {
         if (isDesktop.matches) {
           const expanded = navSection.getAttribute('aria-expanded') === 'true';
@@ -145,6 +200,61 @@ export default async function decorate(block) {
       });
     });
   }
+
+  // Create utility row wrapper (brand + tools)
+  const navTools = nav.querySelector('.nav-tools');
+
+  // Handle utility nav links
+  if (navTools) {
+    // First, convert strong-wrapped links to CTA buttons and remove strong tag
+    navTools.querySelectorAll('strong > a').forEach((link) => {
+      const strong = link.parentElement;
+      const parent = strong.parentElement;
+      link.classList.add('nav-cta');
+      parent.classList.add('nav-cta-container');
+      // Replace strong with just the link
+      strong.replaceWith(link);
+    });
+
+    // Remove default .button class from all links in nav-tools (they get auto-decorated)
+    navTools.querySelectorAll('a.button').forEach((link) => {
+      link.classList.remove('button');
+      const parent = link.closest('.button-container');
+      if (parent) {
+        parent.classList.remove('button-container');
+      }
+    });
+  }
+
+  const utilityRow = document.createElement('div');
+  utilityRow.className = 'nav-utility-row';
+
+  // Move brand and tools into utility row
+  if (navBrand) {
+    utilityRow.appendChild(navBrand);
+  }
+
+  // Add hamburger menu for mobile
+  const hamburger = createHamburgerButton();
+  hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
+
+  if (navTools) {
+    utilityRow.appendChild(navTools);
+  }
+
+  utilityRow.appendChild(hamburger);
+
+  // Build nav structure: utility row on top, sections below
+  const navContent = document.createElement('div');
+  navContent.className = 'nav-content';
+  navContent.appendChild(utilityRow);
+  if (navSections) {
+    navContent.appendChild(navSections);
+  }
+
+  // Clear and rebuild nav
+  nav.innerHTML = '';
+  nav.appendChild(navContent);
 
   const navWrapper = document.createElement('div');
   navWrapper.className = 'nav-wrapper';
