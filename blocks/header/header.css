@@ -186,6 +186,16 @@ header .nav-tools > .default-content-wrapper > ul > li > ul {
   flex-direction: column;
 }
 
+/* Invisible bridge to maintain hover when moving to dropdown */
+header .nav-tools > .default-content-wrapper > ul > li > ul::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  height: 25px;
+}
+
 header .nav-tools > .default-content-wrapper > ul > li:hover > ul {
   display: flex;
 }

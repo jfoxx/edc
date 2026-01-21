@@ -1,125 +1,240 @@
-.simple-hero{
-   background-color: var(--color-blue);
+/* Simple hero - auto-built when h1 + h2 are present */
+.simple-hero {
+  background-color: var(--color-blue);
   color: white;
 
   .hero {
-  padding: 2rem 0;
-  position: relative;
+    padding: 2rem 0;
+    position: relative;
 
-  h1, h2 {
-    color: white;
-  }
+    h1,
+    h2 {
+      color: white;
+    }
 
-  .hero-image {
-    position: absolute;
-    top: 0;
-    right: -10%;
-    width: 50%;
-    height: 100%;
-    background-image: url('/icons/_movement.svg');
-    background-size: cover;
-    background-position: center;
-    filter: invert(1) opacity(0.1);
-  }
+    .hero-image {
+      position: absolute;
+      top: 0;
+      right: -10%;
+      width: 50%;
+      height: 100%;
+      background-image: url('/icons/_movement.svg');
+      background-size: cover;
+      background-position: center;
+      filter: invert(1) opacity(0.1);
+    }
 
-  h2 {
-    font-weight: 100;
+    h2 {
+      font-weight: 100;
+    }
   }
 }
-}
 
+/* Default hero - EDC style with content left, image right */
 .hero-container:not(.simple-hero) {
-  background-image: linear-gradient(90deg, #e5edf7 0, #fff 50%);
-  
+  background: linear-gradient(90deg, #f5f8fc 0%, #fff 40%, #fff 100%);
+  margin: 0;
+
   .hero-wrapper {
     max-width: 100%;
     padding: 0;
   }
 
-  .hero {
- > div {
+  .hero > div {
     display: flex;
-    justify-content: space-between;
-    min-height: 620px;
-    
-    >div:first-of-type {
+    flex-direction: column;
+    min-height: 400px;
+
+    > div:first-of-type {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-height: 100%;
-      padding: 0 24px 0 calc((100% - 1200px)/2);
-      width: calc(40% - 48px);
+      padding: 32px 24px;
+      order: 2;
 
       h1 {
-        color: var(--color-blue)
+        color: var(--color-blue);
+        margin-top: 0;
+        font-size: clamp(28px, 5vw, 42px);
+        font-weight: 700;
+        line-height: 1.2;
       }
 
       p {
-        font-size: var(--heading-font-size-m);
+        font-size: var(--body-font-size-m);
+        line-height: 1.6;
+        color: var(--text-color);
+        max-width: 500px;
+      }
+
+      .button-container {
+        margin-top: 8px;
       }
     }
 
-    >div:last-of-type {
-      min-height: 100%;
-      display: flex;
-      flex-direction: column;
-      width: 60%;
-      align-items: right;
+    > div:last-of-type {
+      order: 1;
+      min-height: 280px;
 
+      picture {
+        display: block;
+        width: 100%;
+        height: 100%;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+    }
+  }
+
+  @media (width >= 900px) {
+    .hero > div {
+      position: relative;
+      min-height: 480px;
+
+      /* Image container - positioned on the right */
+      > div:last-of-type {
+        position: absolute;
+        top: 0;
+        right: -300px;
+        bottom: 0;
+        width: 100%;
+        z-index: 1;
+
+        picture {
+          display: block;
+          width: 100%;
+          height: 100%;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: right;
+          }
+        }
+
+        /* Movement SVG overlay */
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          right: 450px;
+          width: 400px;
+          height: 400px;
+          background-color: var(--color-teal);
+          mask-image: url('/icons/_movement.svg');
+          mask-size: contain;
+          mask-repeat: no-repeat;
+          mask-position: center;
+          pointer-events: none;
+          opacity: 0.9;
+        }
+      }
+
+      /* Content with gradient background overlay */
+      > div:first-of-type {
+        position: relative;
+        z-index: 2;
+        width: 50%;
+        padding: 48px 80px 48px calc(max(32px, (100vw - 1200px) / 2 + 32px));
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 480px;
+        background: linear-gradient(90deg, rgb(255 255 255 / 100%) 0%, rgb(255 255 255 / 95%) 70%, rgb(255 255 255 / 0%) 100%);
+
+        h1 {
+          font-size: 42px;
+        }
+      }
+    }
+  }
+
+  @media (width >= 1200px) {
+    .hero > div {
+      min-height: 520px;
+
+      > div:first-of-type {
+        width: 45%;
+        min-height: 520px;
+        padding: 64px 100px 64px calc((100vw - 1200px) / 2 + 32px);
+      }
+    }
+  }
+}
+
+/* Landing page hero - elaborate design with clip-path */
+body.landing-page .hero-container:not(.simple-hero) {
+  background-image: linear-gradient(90deg, #e5edf7 0, #fff 50%);
+
+  .hero > div {
+    min-height: 620px;
+
+    > div:first-of-type {
+      padding: 0 24px 0 calc((100% - 1200px) / 2);
+      width: calc(40% - 48px);
+      flex: unset;
+
+      p {
+        font-size: var(--heading-font-size-m);
+        max-width: unset;
+      }
+    }
+
+    > div:last-of-type {
+      width: 60%;
+      flex: unset;
+      align-items: flex-end;
 
       picture {
         height: 100%;
         display: flex;
         justify-content: end;
-        width: 100%;
 
         img {
           width: auto;
           height: 100%;
-          object-fit: cover;
           clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0% 100%);
         }
       }
     }
   }
 
-    @media (width < 900px) {
-      > div {
-        flex-direction: column;
-        justify-content: start;
-        align-items: center;
+  @media (width < 900px) {
+    .hero > div {
+      flex-direction: column;
+      justify-content: start;
+      align-items: center;
+      min-height: auto;
 
-        > div:first-of-type {
-          width: 100%;
-          padding: 0 24px;
-          text-align: center;
-          order: 2;
-        }
+      > div:first-of-type {
+        width: 100%;
+        padding: 24px;
+        text-align: center;
+        order: 2;
+        flex: unset;
+      }
 
-        > div:last-of-type {
-          width: 100%;
-          height: 280px;
-          padding: 0;
-          display: flex;
+      > div:last-of-type {
+        width: 100%;
+        height: 280px;
+        flex: unset;
+        order: 1;
+
+        picture {
           justify-content: center;
-          order: 1;
 
-          picture img {
+          img {
             width: 100%;
             height: auto;
-            position: relative;
-            bottom: 0;
-            left: 0;
-            object-fit: cover;
             clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%);
           }
         }
       }
-}
+    }
   }
-
-
-
- 
 }
-
