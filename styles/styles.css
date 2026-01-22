@@ -278,6 +278,46 @@ main .section.shaded {
   padding: 40px 0;
 }
 
+main .section.dark {
+  background-color: #333;
+  color: white;
+  margin: 0;
+  padding: 40px 0;
+}
+
+main .section.dark h1,
+main .section.dark h2,
+main .section.dark h3,
+main .section.dark h4,
+main .section.dark h5,
+main .section.dark h6 {
+  color: white;
+}
+
+main .section.dark a:any-link {
+  color: white;
+}
+
+main .section.blue {
+  background-color: var(--color-blue);
+  color: white;
+  margin: 0;
+  padding: 40px 0;
+}
+
+main .section.blue h1,
+main .section.blue h2,
+main .section.blue h3,
+main .section.blue h4,
+main .section.blue h5,
+main .section.blue h6 {
+  color: white;
+}
+
+main .section.blue a:any-link {
+  color: white;
+}
+
 main .section.inset {
   padding-left: 20%;
   padding-right: 20%;
