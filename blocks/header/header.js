@@ -125,7 +125,7 @@ function createHamburgerButton() {
 export default async function decorate(block) {
   // load nav as fragment
   const navMeta = getMetadata('nav');
-  const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
+  const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav/nav';
   const fragment = await loadFragment(navPath);
 
   // decorate nav DOM
