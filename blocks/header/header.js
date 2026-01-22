@@ -126,6 +126,7 @@ export default async function decorate(block) {
   // load nav as fragment
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav/nav';
+  const isSimpleNav = navPath.includes('simple');
   const fragment = await loadFragment(navPath);
 
   // decorate nav DOM
@@ -257,7 +258,7 @@ export default async function decorate(block) {
   nav.appendChild(navContent);
 
   const navWrapper = document.createElement('div');
-  navWrapper.className = 'nav-wrapper';
+  navWrapper.className = isSimpleNav ? 'nav-wrapper simple' : 'nav-wrapper';
   navWrapper.append(nav);
   block.append(navWrapper);
 }
