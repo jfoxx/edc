@@ -1,6 +1,6 @@
 .cards > ul {
   list-style: none;
-  margin: 0;
+  margin: 40px 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -9,6 +9,8 @@
 
 .cards > ul > li {
   background-color: var(--background-color);
+  border: 1px solid var(--color-blue);
+  border-radius: 10px;
 }
 
 .cards .cards-card-body {
@@ -47,4 +49,74 @@
       border: 2px solid var(--color-blue);
     }
   }
+}
+
+/* Two-up variant - 2 columns */
+.cards.two-up > ul {
+  grid-template-columns: 1fr;
+}
+
+@media (width >= 900px) {
+  .cards.two-up > ul {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Icons variant - icon beside title, styled like EDC solutions cards */
+.cards.icons > ul {
+  grid-template-columns: 1fr;
+}
+
+@media (width >= 900px) {
+  .cards.icons > ul {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.cards.icons > ul > li {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px;
+  border-color: var(--color-light-gray);
+  transition: box-shadow 0.2s;
+}
+
+.cards.icons > ul > li:hover {
+  box-shadow: 0 4px 12px rgba(0 0 0 / 10%);
+}
+
+.cards.icons .cards-card-image {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  line-height: 0;
+}
+
+.cards.icons > ul > li img {
+  width: 48px;
+  height: 48px;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+}
+
+.cards.icons .cards-card-body {
+  flex: 1;
+  margin: 0;
+}
+
+.cards.icons .cards-card-body h3,
+.cards.icons .cards-card-body h4,
+.cards.icons .cards-card-body h5,
+.cards.icons .cards-card-body h6 {
+  margin: 0 0 8px;
+  font-size: var(--heading-font-size-s);
+  color: var(--color-blue);
+}
+
+.cards.icons .cards-card-body p {
+  margin: 0;
+  font-size: var(--body-font-size-s);
+  color: var(--text-color);
 }

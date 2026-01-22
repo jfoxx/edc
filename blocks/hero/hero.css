@@ -41,19 +41,45 @@
   }
 
   .hero > div {
-    display: flex;
-    flex-direction: column;
-    min-height: 400px;
+    position: relative;
+    min-height: 500px;
 
+    /* Image - positioned behind text */
+    > div:last-of-type {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 70%;
+      z-index: 1;
+
+      picture {
+        display: block;
+        width: 100%;
+        height: 100%;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center top;
+        }
+      }
+    }
+
+    /* Content - positioned at bottom with upward gradient */
     > div:first-of-type {
+      position: relative;
+      z-index: 2;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-end;
+      min-height: 500px;
       padding: 32px 24px;
-      order: 2;
+      background: linear-gradient(0deg, rgb(255 255 255 / 100%) 0%, rgb(255 255 255 / 100%) 40%, rgb(255 255 255 / 0%) 70%);
 
       h1 {
-        color: var(--color-blue);
+        color: var(--dark-color);
         margin-top: 0;
         font-size: clamp(28px, 5vw, 42px);
         font-weight: 700;
@@ -71,23 +97,6 @@
         margin-top: 8px;
       }
     }
-
-    > div:last-of-type {
-      order: 1;
-      min-height: 280px;
-
-      picture {
-        display: block;
-        width: 100%;
-        height: 100%;
-
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-      }
-    }
   }
 
   @media (width >= 900px) {
@@ -98,10 +107,9 @@
       /* Image container - positioned on the right */
       > div:last-of-type {
         position: absolute;
-        top: 0;
-        right: -300px;
-        bottom: 0;
+        inset: 0 -300px 0 auto;
         width: 100%;
+        height: auto;
         z-index: 1;
 
         picture {
@@ -145,6 +153,8 @@
         flex-direction: column;
         justify-content: center;
         min-height: 480px;
+
+        /* Horizontal gradient for desktop */
         background: linear-gradient(90deg, rgb(255 255 255 / 100%) 0%, rgb(255 255 255 / 95%) 70%, rgb(255 255 255 / 0%) 100%);
 
         h1 {
@@ -193,7 +203,7 @@ body.landing-page .hero-container:not(.simple-hero) {
       picture {
         height: 100%;
         display: flex;
-        justify-content: end;
+        justify-content: flex-end;
 
         img {
           width: auto;
@@ -207,7 +217,7 @@ body.landing-page .hero-container:not(.simple-hero) {
   @media (width < 900px) {
     .hero > div {
       flex-direction: column;
-      justify-content: start;
+      justify-content: flex-start;
       align-items: center;
       min-height: auto;
 

@@ -1,0 +1,330 @@
+/* Card Tabs Block - styled to match EDC "Expert insights" section */
+.card-tabs {
+  background-color: var(--color-blue);
+  padding: 40px 0;
+  margin: 0 -24px;
+  color: white;
+}
+
+@media (width >= 900px) {
+  .card-tabs {
+    margin: 0 -32px;
+  }
+}
+
+.card-tabs-list {
+  display: flex;
+  gap: 12px;
+  padding: 0 24px 24px;
+  flex-wrap: wrap;
+}
+
+@media (width >= 900px) {
+  .card-tabs-list {
+    padding: 0 32px 24px;
+  }
+}
+
+.card-tabs-list button {
+  margin: 0;
+  padding: 10px 24px;
+  border: 2px solid white;
+  border-radius: 50px;
+  background-color: transparent;
+  color: white;
+  font-size: var(--body-font-size-s);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.card-tabs-list button:hover {
+  background-color: rgba(255 255 255 / 20%);
+}
+
+.card-tabs-list button[aria-selected='true'] {
+  background-color: white;
+  color: var(--color-blue);
+}
+
+.card-tabs-panels {
+  padding: 0 24px;
+}
+
+@media (width >= 900px) {
+  .card-tabs-panels {
+    padding: 0 32px;
+  }
+}
+
+.card-tabs-panel[aria-hidden='true'] {
+  display: none;
+}
+
+.card-tabs-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (width >= 900px) {
+  .card-tabs-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+}
+
+.card-tabs-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background-color: transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: background-color 0.2s;
+}
+
+.card-tabs-card:hover {
+  background-color: rgba(255 255 255 / 10%);
+}
+
+@media (width >= 900px) {
+  .card-tabs-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+}
+
+.card-tabs-card-image {
+  flex-shrink: 0;
+  width: 100px;
+  height: 75px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+@media (width >= 900px) {
+  .card-tabs-card-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px 8px 0 0;
+  }
+}
+
+.card-tabs-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (width >= 900px) {
+  .card-tabs-card-image img {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.card-tabs-card-body {
+  flex: 1;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (width >= 900px) {
+  .card-tabs-card-body {
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 16px;
+  }
+}
+
+.card-tabs-card-body h3,
+.card-tabs-card-body h4,
+.card-tabs-card-body h5,
+.card-tabs-card-body h6 {
+  flex: 1;
+  margin: 0;
+  font-size: var(--body-font-size-s);
+  font-weight: 600;
+  color: white;
+  line-height: 1.4;
+}
+
+.card-tabs-card-body p {
+  flex: 1;
+  margin: 0;
+  font-size: var(--body-font-size-xs);
+  color: rgba(255 255 255 / 80%);
+}
+
+.card-tabs-card-body a {
+  color: white;
+  text-decoration: none;
+}
+
+.card-tabs-card-body a:hover {
+  text-decoration: underline;
+}
+
+.card-tabs-card-arrow {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+.card-tabs-card-arrow svg {
+  width: 20px;
+  height: 20px;
+  color: var(--color-blue);
+}
+
+.card-tabs-footer-link {
+  display: inline-block;
+  margin-top: 24px;
+  padding: 12px 24px;
+  color: white;
+  font-weight: 500;
+  text-decoration: none;
+  border: 2px solid white;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.card-tabs-footer-link:hover {
+  background-color: rgba(255 255 255 / 20%);
+  text-decoration: none;
+  color: white;
+}
+
+/* Two-up variant - 2 columns instead of 3 */
+@media (width >= 900px) {
+  .card-tabs.two-up .card-tabs-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Icons variant - icon beside title, white card background */
+.card-tabs.icons {
+  background-color: var(--light-color);
+  color: var(--text-color);
+}
+
+.card-tabs.icons .card-tabs-list button {
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+.card-tabs.icons .card-tabs-list button:hover {
+  background-color: var(--color-light-blue);
+}
+
+.card-tabs.icons .card-tabs-list button[aria-selected='true'] {
+  background-color: var(--color-blue);
+  color: white;
+}
+
+.card-tabs.icons .card-tabs-card {
+  flex-direction: row;
+  align-items: flex-start;
+  background-color: white;
+  border: 1px solid var(--color-light-gray);
+  border-radius: 8px;
+  padding: 24px;
+  gap: 16px;
+}
+
+.card-tabs.icons .card-tabs-card:hover {
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0 0 0 / 10%);
+}
+
+@media (width >= 900px) {
+  .card-tabs.icons .card-tabs-card {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+.card-tabs.icons .card-tabs-card-image {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 0;
+  overflow: visible;
+}
+
+@media (width >= 900px) {
+  .card-tabs.icons .card-tabs-card-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 0;
+  }
+}
+
+.card-tabs.icons .card-tabs-card-image img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+@media (width >= 900px) {
+  .card-tabs.icons .card-tabs-card-image img {
+    aspect-ratio: 1 / 1;
+  }
+}
+
+.card-tabs.icons .card-tabs-card-body {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 0;
+}
+
+@media (width >= 900px) {
+  .card-tabs.icons .card-tabs-card-body {
+    padding: 0;
+  }
+}
+
+.card-tabs.icons .card-tabs-card-body h3,
+.card-tabs.icons .card-tabs-card-body h4,
+.card-tabs.icons .card-tabs-card-body h5,
+.card-tabs.icons .card-tabs-card-body h6 {
+  color: var(--color-blue);
+  font-size: var(--heading-font-size-s);
+}
+
+.card-tabs.icons .card-tabs-card-body p {
+  color: var(--text-color);
+  font-size: var(--body-font-size-s);
+}
+
+.card-tabs.icons .card-tabs-card-body a {
+  color: var(--color-blue);
+}
+
+.card-tabs.icons .card-tabs-card-arrow {
+  display: none;
+}
+
+.card-tabs.icons .card-tabs-footer-link {
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+.card-tabs.icons .card-tabs-footer-link:hover {
+  background-color: var(--color-light-blue);
+  color: var(--color-blue);
+}
