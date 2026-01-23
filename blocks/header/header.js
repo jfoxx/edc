@@ -126,6 +126,7 @@ export default async function decorate(block) {
   // load nav as fragment
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav/nav';
+  const isSimpleNav = navPath.includes('simple');
   const fragment = await loadFragment(navPath);
 
   // decorate nav DOM
@@ -134,11 +135,21 @@ export default async function decorate(block) {
   nav.id = 'nav';
   while (fragment.firstElementChild) nav.append(fragment.firstElementChild);
 
-  const classes = ['brand', 'sections', 'tools'];
-  classes.forEach((c, i) => {
-    const section = nav.children[i];
-    if (section) section.classList.add(`nav-${c}`);
-  });
+  // For simple nav (2 sections), assign brand and tools only
+  // For full nav (3 sections), assign brand, sections, and tools
+  const numSections = nav.children.length;
+  if (numSections === 2) {
+    // Simple nav: brand + tools (no sections)
+    nav.children[0]?.classList.add('nav-brand');
+    nav.children[1]?.classList.add('nav-tools');
+  } else {
+    // Full nav: brand + sections + tools
+    const classes = ['brand', 'sections', 'tools'];
+    classes.forEach((c, i) => {
+      const section = nav.children[i];
+      if (section) section.classList.add(`nav-${c}`);
+    });
+  }
 
   const navBrand = nav.querySelector('.nav-brand');
   const brandLink = navBrand?.querySelector('.button');
@@ -257,7 +268,7 @@ export default async function decorate(block) {
   nav.appendChild(navContent);
 
   const navWrapper = document.createElement('div');
-  navWrapper.className = 'nav-wrapper';
+  navWrapper.className = isSimpleNav ? 'nav-wrapper simple' : 'nav-wrapper';
   navWrapper.append(nav);
   block.append(navWrapper);
 }

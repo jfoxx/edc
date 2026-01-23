@@ -658,3 +658,80 @@ header .breadcrumbs ol li[aria-current] {
     padding: 0 32px;
   }
 }
+
+/* ========================================
+   Simple Nav Variant
+   ======================================== */
+header .nav-wrapper.simple {
+  --nav-utility-height: 60px;
+  --nav-total-height: var(--nav-utility-height);
+
+  box-shadow: none;
+  border-bottom: 1px solid var(--nav-border-color);
+}
+
+header .nav-wrapper.simple .nav-sections {
+  display: none;
+}
+
+header .nav-wrapper.simple .nav-utility-row {
+  height: var(--nav-utility-height);
+}
+
+header .nav-wrapper.simple .nav-tools > .default-content-wrapper > ul {
+  gap: 8px;
+}
+
+header .nav-wrapper.simple .nav-tools > .default-content-wrapper > ul > li > p,
+header .nav-wrapper.simple .nav-tools > .default-content-wrapper > ul > li > p > a {
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+/* Phone number styling */
+header .nav-wrapper.simple .nav-tools > .default-content-wrapper > ul > li:first-child > p {
+  font-weight: 500;
+  color: var(--nav-text-color);
+}
+
+header .nav-wrapper.simple .nav-tools > .default-content-wrapper > ul > li:first-child > p::before {
+  display: none;
+}
+
+/* Language toggle as bordered button */
+header .nav-wrapper.simple .nav-tools > .default-content-wrapper > ul > li:last-child > p > a {
+  border: 1px solid var(--nav-border-color);
+  border-radius: 4px;
+  padding: 8px 20px;
+  font-weight: 500;
+}
+
+header .nav-wrapper.simple .nav-tools > .default-content-wrapper > ul > li:last-child > p > a:hover {
+  border-color: var(--nav-blue);
+  color: var(--nav-blue);
+}
+
+/* Divider between phone and language */
+header .nav-wrapper.simple .nav-tools > .default-content-wrapper > ul > li:first-child::after {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 24px;
+  background-color: var(--nav-border-color);
+  margin-left: 16px;
+}
+
+/* Hide hamburger on simple nav */
+header .nav-wrapper.simple .nav-hamburger {
+  display: none;
+}
+
+/* Show ALL utility items on simple nav (override mobile hiding) */
+header .nav-wrapper.simple .nav-tools > .default-content-wrapper > ul > li {
+  display: flex !important;
+}
+
+header .nav-wrapper.simple .nav-tools > .default-content-wrapper > ul > li > p {
+  display: flex;
+  align-items: center;
+}
