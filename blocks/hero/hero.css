@@ -30,6 +30,45 @@
   }
 }
 
+/* Webinar status badge */
+.hero-webinar-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--body-font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+
+.hero-webinar-status.upcoming {
+  color: var(--color-blue);
+}
+
+.hero-webinar-status.upcoming .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.hero-webinar-status.upcoming .icon img {
+  filter: invert(30%) sepia(98%) saturate(500%) hue-rotate(190deg);
+}
+
+.hero-webinar-status.on-demand {
+  color: #1e7e34;
+}
+
+.hero-webinar-status.on-demand .icon {
+  width: 20px;
+  height: 20px;
+  transform: rotate(-90deg);
+}
+
+.hero-webinar-status.on-demand .icon img {
+  filter: invert(40%) sepia(60%) saturate(500%) hue-rotate(90deg);
+}
+
 /* Default hero - EDC style with content left, image right */
 .hero-container:not(.simple-hero) {
   background: linear-gradient(90deg, #f5f8fc 0%, #fff 40%, #fff 100%);
@@ -177,9 +216,15 @@
   }
 }
 
-/* Landing page hero - elaborate design with clip-path */
-body.landing-page .hero-container:not(.simple-hero) {
+/* Landing page / Webinar hero - elaborate design with clip-path */
+body.landing-page .hero-container:not(.simple-hero),
+body.webinar .hero-container:not(.simple-hero) {
   background-image: linear-gradient(90deg, #e5edf7 0, #fff 50%);
+
+  /* Hide movement SVG overlay on landing pages */
+  .hero > div > div:last-of-type::after {
+    display: none;
+  }
 
   .hero > div {
     min-height: 620px;
@@ -188,6 +233,7 @@ body.landing-page .hero-container:not(.simple-hero) {
       padding: 0 24px 0 calc((100% - 1200px) / 2);
       width: calc(40% - 48px);
       flex: unset;
+      background: none;
 
       p {
         font-size: var(--heading-font-size-m);
@@ -203,7 +249,8 @@ body.landing-page .hero-container:not(.simple-hero) {
       picture {
         height: 100%;
         display: flex;
-        justify-content: flex-end;
+        justify-content: center;
+        margin-left: -100px;
 
         img {
           width: auto;
@@ -227,6 +274,7 @@ body.landing-page .hero-container:not(.simple-hero) {
         text-align: center;
         order: 2;
         flex: unset;
+        background: none;
       }
 
       > div:last-of-type {
