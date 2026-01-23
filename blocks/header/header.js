@@ -154,7 +154,7 @@ export default async function decorate(block) {
   const navBrand = nav.querySelector('.nav-brand');
   if (navBrand) {
     // Check if there's already a link
-    let brandLink = navBrand.querySelector('a');
+    const brandLink = navBrand.querySelector('a');
     if (brandLink) {
       brandLink.className = '';
       brandLink.href = '/';
