@@ -4,6 +4,13 @@
   "editUrlPattern": "https://da.live/edit#/{{org}}/{{site}}{{pathname}}",
   "plugins": [
     {
+      "id": "da-plugin-form-picker",
+      "title": "Forms",
+      "environments": ["edit"],
+      "daLibrary": true,
+      "url": "/tools/form-picker/form-picker.html"
+    },
+    {
       "id": "da-plugin-demo",
       "title": "Plugin demo",
       "environments": ["edit"],

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Form Picker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="data:,">
+  <!-- Adobe Clean Font (Spectrum) -->
+  <link rel="stylesheet" href="https://use.typekit.net/uma8ayv.css">
+  <link rel="stylesheet" href="form-picker.css">
+</head>
+<body>
+  <div class="form-picker-wrapper">
+    <form class="form-picker-form">
+      <div class="search-container">
+        <input type="text" 
+               class="form-search" 
+               placeholder="Search forms by name..." 
+               role="searchbox" 
+               aria-label="Search forms">
+      </div>
+      
+      <ul class="forms-list">
+        <div class="loading-state">Loading forms...</div>
+      </ul>
+    </form>
+
+    <div class="actions-container">
+      <div class="message-wrapper hidden">
+        <div class="feedback-message"></div>
+      </div>
+      
+      <div class="button-group">
+        <button class="form-btn" 
+                type="button" 
+                title="Refresh the Forms List" 
+                role="button" 
+                aria-label="Refresh forms list">
+          Refresh
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="form-picker.js"></script>
+</body>
+</html>
