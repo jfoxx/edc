@@ -152,10 +152,27 @@ export default async function decorate(block) {
   }
 
   const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand?.querySelector('.button');
-  if (brandLink) {
-    brandLink.className = '';
-    brandLink.closest('.button-container').className = '';
+  if (navBrand) {
+    // Check if there's already a link
+    let brandLink = navBrand.querySelector('a');
+    if (brandLink) {
+      brandLink.className = '';
+      brandLink.href = '/';
+      const buttonContainer = brandLink.closest('.button-container');
+      if (buttonContainer) {
+        buttonContainer.className = '';
+      }
+    } else {
+      // If no link exists, wrap the image in a link
+      const brandImg = navBrand.querySelector('img');
+      if (brandImg) {
+        const link = document.createElement('a');
+        link.href = '/';
+        link.setAttribute('aria-label', 'Home');
+        brandImg.parentNode.insertBefore(link, brandImg);
+        link.appendChild(brandImg);
+      }
+    }
   }
 
   const navSections = nav.querySelector('.nav-sections');

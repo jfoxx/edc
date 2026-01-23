@@ -427,3 +427,58 @@ main .section[data-align="left"] > div {
     }
   }
 }
+
+/* Webinar 3-column layout */
+.webinar-layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (width >= 900px) {
+  .webinar-layout-wrapper {
+    flex-direction: row;
+    gap: 32px;
+  }
+
+  .webinar-col-left {
+    flex: 0 0 20%;
+    margin-top: 48px;
+  }
+
+  .webinar-col-main {
+    flex: 0 0 60%;
+  }
+
+  .webinar-col-right {
+    flex: 0 0 20%;
+  }
+}
+
+/* Webinar event details sidebar */
+.webinar-event-details {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.webinar-event-label {
+  font-size: var(--body-font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-color);
+  margin: 0 0 8px;
+}
+
+.webinar-event-date,
+.webinar-event-time,
+.webinar-event-place {
+  margin: 0;
+  font-size: var(--body-font-size-m);
+  color: var(--text-color);
+}
+
+.webinar-event-time {
+  color: var(--dark-color);
+}

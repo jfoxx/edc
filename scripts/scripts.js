@@ -76,6 +76,127 @@ async function loadFonts() {
 }
 
 /**
+ * Builds webinar 3-column layout for first section after hero.
+ * @param {Element} main The container element
+ */
+function buildWebinarLayout(main) {
+  if (!document.body.classList.contains('webinar')) return;
+
+  // Find the first section after the hero
+  const sections = [...main.querySelectorAll(':scope > .section')];
+  const targetSection = sections.find((section) => !section.querySelector('.hero'));
+
+  if (!targetSection) return;
+
+  // Find the section-divider block
+  const divider = targetSection.querySelector('.section-divider-wrapper');
+  if (!divider) return;
+
+  // Create 3-column layout wrapper
+  const wrapper = document.createElement('div');
+  wrapper.classList.add('webinar-layout-wrapper');
+
+  // Column 1: Auto-generated event details (20%)
+  const col1 = document.createElement('div');
+  col1.classList.add('webinar-col-left');
+
+  // Build event details from metadata
+  const rawDate = getMetadata('date');
+  const eventTime = getMetadata('time');
+  const isFrench = window.location.pathname.includes('/fr/');
+  const defaultLocation = isFrench ? 'En ligne' : 'Online';
+  const eventLocation = getMetadata('location') || defaultLocation;
+
+  // Format date based on language
+  let eventDate = '';
+  if (rawDate) {
+    const parts = rawDate.split('/');
+    if (parts.length === 3) {
+      const dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+      if (isFrench) {
+        const daysFr = ['dim.', 'lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.'];
+        const monthsFr = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+          'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+        const dayName = daysFr[dateObj.getDay()];
+        const monthName = monthsFr[dateObj.getMonth()];
+        const day = dateObj.getDate();
+        const year = dateObj.getFullYear();
+        eventDate = `${dayName}, ${day} ${monthName}, ${year}`;
+      } else {
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const months = ['January', 'February', 'March', 'April', 'May', 'June',
+          'July', 'August', 'September', 'October', 'November', 'December'];
+        const dayName = days[dateObj.getDay()];
+        const monthName = months[dateObj.getMonth()];
+        const day = dateObj.getDate();
+        const year = dateObj.getFullYear();
+        eventDate = `${dayName}, ${monthName} ${day}, ${year}`;
+      }
+    } else {
+      eventDate = rawDate;
+    }
+  }
+
+  // Labels based on language
+  const labelDateTime = isFrench ? 'Date et heure' : 'Date and time';
+  const labelLocation = isFrench ? 'Emplacement' : 'Location';
+
+  let eventDetailsHTML = '<div class="webinar-event-details">';
+
+  if (eventDate || eventTime) {
+    eventDetailsHTML += '<div class="webinar-event-datetime">';
+    eventDetailsHTML += `<p class="webinar-event-label">${labelDateTime}</p>`;
+    if (eventDate) {
+      eventDetailsHTML += `<p class="webinar-event-date">${eventDate}</p>`;
+    }
+    if (eventTime) {
+      eventDetailsHTML += `<p class="webinar-event-time">${eventTime}</p>`;
+    }
+    eventDetailsHTML += '</div>';
+  }
+
+  eventDetailsHTML += '<div class="webinar-event-location">';
+  eventDetailsHTML += `<p class="webinar-event-label">${labelLocation}</p>`;
+  eventDetailsHTML += `<p class="webinar-event-place">${eventLocation}</p>`;
+  eventDetailsHTML += '</div>';
+
+  eventDetailsHTML += '</div>';
+  col1.innerHTML = eventDetailsHTML;
+
+  // Column 2: Content before divider (60%)
+  const col2 = document.createElement('div');
+  col2.classList.add('webinar-col-main');
+
+  // Column 3: Content after divider (20%)
+  const col3 = document.createElement('div');
+  col3.classList.add('webinar-col-right');
+
+  // Collect children and split by divider
+  let currentCol = col2;
+  const children = [...targetSection.children];
+  children.forEach((child) => {
+    if (child === divider) {
+      currentCol = col3;
+      return;
+    }
+    if (child.classList.contains('section-metadata-wrapper')) return;
+    currentCol.appendChild(child);
+  });
+
+  // Remove the divider
+  divider.remove();
+
+  // Build the layout
+  wrapper.appendChild(col1);
+  wrapper.appendChild(col2);
+  wrapper.appendChild(col3);
+  targetSection.insertBefore(wrapper, targetSection.firstChild);
+
+  // Add class to section for styling
+  targetSection.classList.add('webinar-layout');
+}
+
+/**
  * Builds two column grid.
  * @param {Element} main The container element
  */
@@ -328,6 +449,7 @@ async function loadEager(doc) {
   if (main) {
     decorateMain(main);
     buildLayoutContainer(main);
+    buildWebinarLayout(main);
     doc.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
   }
