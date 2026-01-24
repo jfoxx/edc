@@ -42,6 +42,11 @@
   ],
   "apps": [
     {
+      "title": "Stale Content Finder",
+      "description": "Find content that hasn't been modified in 6+ months",
+      "path": "/tools/stale-content"
+    },
+    {
       "title": "App demo",
       "description": "This is a sample app using the DA SDK.",
       "url": "https://da.live/app/aemsites/da-block-collection/tools/demo-app"

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stale Content Finder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="https://use.typekit.net/uma8ayv.css">
+  <link rel="stylesheet" href="stale-content.css">
+</head>
+<body>
+  <div class="stale-content-app">
+    <header class="app-header">
+      <h1>Stale Content Finder</h1>
+      <p class="app-description">Find content that hasn't been modified in 6+ months</p>
+    </header>
+
+    <div class="controls">
+      <div class="control-row">
+        <label for="start-path">Starting Path</label>
+        <input type="text" id="start-path" placeholder="/" value="/">
+      </div>
+      <div class="control-row">
+        <label for="months-threshold">Months Since Modified</label>
+        <input type="number" id="months-threshold" min="1" max="60" value="6">
+      </div>
+      <div class="control-row buttons">
+        <button type="button" id="scan-btn" class="primary-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" fill="currentColor">
+            <path d="M17.675 16.325l-4.1-4.1A7.018 7.018 0 0014.5 7.5a7 7 0 10-7 7 7.018 7.018 0 004.725-.925l4.1 4.1a1 1 0 001.35-1.35zM2.5 7.5a5 5 0 115 5 5.006 5.006 0 01-5-5z"/>
+          </svg>
+          Scan for Stale Content
+        </button>
+        <button type="button" id="cancel-btn" class="secondary-btn hidden">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <div class="progress-section hidden" id="progress-section">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-text" id="progress-text">Scanning...</div>
+    </div>
+
+    <div class="stats hidden" id="stats">
+      <div class="stat-item">
+        <span class="stat-value" id="total-scanned">0</span>
+        <span class="stat-label">Total Scanned</span>
+      </div>
+      <div class="stat-item stale">
+        <span class="stat-value" id="stale-count">0</span>
+        <span class="stat-label">Stale Items</span>
+      </div>
+    </div>
+
+    <div class="results-section hidden" id="results-section">
+      <div class="results-header">
+        <h2>Stale Content <span class="selected-count" id="selected-count"></span></h2>
+        <div class="results-actions">
+          <button type="button" id="select-all-btn" class="text-btn">Select All</button>
+          <button type="button" id="deselect-all-btn" class="text-btn">Deselect All</button>
+          <button type="button" id="export-btn" class="export-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" fill="currentColor">
+              <path d="M9 1a.75.75 0 00-.75.75v8.19L6.28 8.03a.75.75 0 00-1.06 1.06l3 3a.75.75 0 001.06 0l3-3a.75.75 0 00-1.06-1.06l-1.97 1.91V1.75A.75.75 0 009 1z"/>
+              <path d="M3 12.25a.75.75 0 00-1.5 0v2.5A2.25 2.25 0 003.75 17h10.5a2.25 2.25 0 002.25-2.25v-2.5a.75.75 0 00-1.5 0v2.5a.75.75 0 01-.75.75H3.75a.75.75 0 01-.75-.75v-2.5z"/>
+            </svg>
+            Export CSV
+          </button>
+          <button type="button" id="export-selected-btn" class="export-btn hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" fill="currentColor">
+              <path d="M9 1a.75.75 0 00-.75.75v8.19L6.28 8.03a.75.75 0 00-1.06 1.06l3 3a.75.75 0 001.06 0l3-3a.75.75 0 00-1.06-1.06l-1.97 1.91V1.75A.75.75 0 009 1z"/>
+              <path d="M3 12.25a.75.75 0 00-1.5 0v2.5A2.25 2.25 0 003.75 17h10.5a2.25 2.25 0 002.25-2.25v-2.5a.75.75 0 00-1.5 0v2.5a.75.75 0 01-.75.75H3.75a.75.75 0 01-.75-.75v-2.5z"/>
+            </svg>
+            Export Selected
+          </button>
+        </div>
+      </div>
+      <ul class="results-list" id="results-list"></ul>
+    </div>
+
+    <div class="empty-state" id="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" fill="currentColor">
+        <path d="M16 2H2a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V3a1 1 0 00-1-1zm-1 12H3V4h12z"/>
+        <path d="M5 6.5h8a.5.5 0 000-1H5a.5.5 0 000 1zM5 9.5h8a.5.5 0 000-1H5a.5.5 0 000 1zM5 12.5h5a.5.5 0 000-1H5a.5.5 0 000 1z"/>
+      </svg>
+      <p>Click "Scan for Stale Content" to find content that hasn't been updated recently.</p>
+    </div>
+
+    <div class="message-wrapper hidden" id="message-wrapper">
+      <div class="feedback-message" id="feedback"></div>
+    </div>
+  </div>
+
+  <script type="module" src="stale-content.js"></script>
+</body>
+</html>
