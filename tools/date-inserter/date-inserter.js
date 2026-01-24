@@ -3,15 +3,30 @@
 import DA_SDK from 'https://da.live/nx/utils/sdk.js';
 
 /**
- * Gets today's date in ISO format (YYYY-MM-DD)
- * @returns {string} Today's date in ISO format
+ * Gets current date and time in ISO format (YYYY-MM-DDTHH:MM)
+ * @returns {string} Current date and time in ISO format
  */
-function getTodayISO() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+function getNowISO() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+/**
+ * Formats date and optional time into ISO format
+ * @param {string} date - Date in YYYY-MM-DD format
+ * @param {string} [time] - Optional time in HH:MM format
+ * @returns {string} Formatted date/datetime string
+ */
+function formatDateTime(date, time) {
+  if (time) {
+    return `${date}T${time}`;
+  }
+  return date;
 }
 
 /**
@@ -30,7 +45,7 @@ const mockActions = {
     // eslint-disable-next-line no-console
     console.log('sendText called with:', text);
     // eslint-disable-next-line no-alert
-    alert(`Date inserted: ${text}`);
+    alert(`Inserted: ${text}`);
   },
   closeLibrary: () => {
     // eslint-disable-next-line no-console
@@ -39,21 +54,21 @@ const mockActions = {
 };
 
 /**
- * Inserts a date and closes the library
+ * Inserts text and closes the library
  * @param {Object} actions - DA SDK actions
- * @param {string} date - Date string to insert
+ * @param {string} text - Text to insert
  * @param {HTMLElement} feedback - Feedback element
  */
-function insertDate(actions, date, feedback) {
+function insertText(actions, text, feedback) {
   if (!actions?.sendText) {
-    feedback.textContent = 'Cannot insert date: Editor not available';
+    feedback.textContent = 'Cannot insert: Editor not available';
     feedback.classList.add('error');
     feedback.classList.remove('success');
     return;
   }
 
-  actions.sendText(date);
-  feedback.textContent = 'Date inserted!';
+  actions.sendText(text);
+  feedback.textContent = 'Inserted!';
   feedback.classList.add('success');
   feedback.classList.remove('error');
 
@@ -81,35 +96,47 @@ function insertDate(actions, date, feedback) {
   const todayDisplay = document.getElementById('today-date');
   const insertTodayBtn = document.getElementById('insert-today-btn');
   const datePicker = document.getElementById('date-picker');
+  const timePicker = document.getElementById('time-picker');
   const insertCustomBtn = document.getElementById('insert-custom-btn');
   const feedback = document.getElementById('feedback');
 
-  // Display today's date
-  const todayDate = getTodayISO();
-  todayDisplay.textContent = todayDate;
+  // Display current date/time and update every minute
+  function updateNowDisplay() {
+    todayDisplay.textContent = getNowISO();
+  }
+  updateNowDisplay();
+  setInterval(updateNowDisplay, 60000);
 
-  // Insert today's date on button click
+  // Insert current date/time on button click
   insertTodayBtn.addEventListener('click', () => {
-    insertDate(actions, todayDate, feedback);
+    insertText(actions, getNowISO(), feedback);
   });
 
-  // Enable/disable custom insert button based on date picker value
-  datePicker.addEventListener('input', () => {
+  // Update button state when inputs change
+  function updateButtonState() {
     insertCustomBtn.disabled = !datePicker.value;
-  });
+  }
 
-  // Insert custom date on button click
+  datePicker.addEventListener('input', updateButtonState);
+  timePicker.addEventListener('input', updateButtonState);
+
+  // Insert custom date/time on button click
   insertCustomBtn.addEventListener('click', () => {
     if (datePicker.value) {
-      insertDate(actions, datePicker.value, feedback);
+      const formatted = formatDateTime(datePicker.value, timePicker.value);
+      insertText(actions, formatted, feedback);
     }
   });
 
-  // Allow pressing Enter in date picker to insert
-  datePicker.addEventListener('keydown', (e) => {
+  // Allow pressing Enter to insert
+  function handleEnter(e) {
     if (e.key === 'Enter' && datePicker.value) {
       e.preventDefault();
-      insertDate(actions, datePicker.value, feedback);
+      const formatted = formatDateTime(datePicker.value, timePicker.value);
+      insertText(actions, formatted, feedback);
     }
-  });
+  }
+
+  datePicker.addEventListener('keydown', handleEnter);
+  timePicker.addEventListener('keydown', handleEnter);
 }());
