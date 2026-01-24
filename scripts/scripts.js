@@ -467,6 +467,73 @@ async function loadEager(doc) {
 }
 
 /**
+ * Parses a date string in various formats and returns a Date object.
+ * Supports: YYYY-MM-DD, MM/DD/YYYY, DD/MM/YYYY
+ * @param {string} dateStr The date string to parse
+ * @returns {Date|null} Parsed date or null if invalid
+ */
+function parseDate(dateStr) {
+  if (!dateStr) return null;
+
+  const trimmed = dateStr.trim();
+
+  // Try YYYY-MM-DD format
+  const isoMatch = trimmed.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (isoMatch) {
+    const [, year, month, day] = isoMatch;
+    return new Date(Number(year), Number(month) - 1, Number(day));
+  }
+
+  // Try MM/DD/YYYY or DD/MM/YYYY format
+  const slashMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (slashMatch) {
+    const [, first, second, year] = slashMatch;
+    // Heuristic: if first > 12, assume DD/MM/YYYY
+    // Otherwise assume MM/DD/YYYY (US format)
+    if (Number(first) > 12) {
+      // DD/MM/YYYY
+      return new Date(Number(year), Number(second) - 1, Number(first));
+    }
+    // MM/DD/YYYY
+    return new Date(Number(year), Number(first) - 1, Number(second));
+  }
+
+  return null;
+}
+
+/**
+ * Formats a Date object as YYYY-MM-DD.
+ * @param {Date} date The date to format
+ * @returns {string} Formatted date string
+ */
+function formatDateISO(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Adds last modified date to the bottom of main if metadata exists.
+ * @param {Element} main The main element
+ */
+function addLastModifiedDate(main) {
+  const lastModified = getMetadata('last-modified');
+  if (!lastModified) return;
+
+  const date = parseDate(lastModified);
+  if (!date || Number.isNaN(date.getTime())) return;
+
+  const isFrench = window.location.pathname.includes('/fr/');
+  const label = isFrench ? 'Date de modification' : 'Date modified';
+  const formattedDate = formatDateISO(date);
+  const dateElement = document.createElement('div');
+  dateElement.className = 'last-modified';
+  dateElement.textContent = `${label}: ${formattedDate}`;
+  main.append(dateElement);
+}
+
+/**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
  */
@@ -475,6 +542,9 @@ async function loadLazy(doc) {
 
   const main = doc.querySelector('main');
   await loadSections(main);
+
+  // Add last modified date to bottom of main
+  addLastModifiedDate(main);
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;

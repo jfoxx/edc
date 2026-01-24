@@ -489,3 +489,19 @@ main .section[data-align="left"] > div {
 .webinar-event-time {
   color: var(--dark-color);
 }
+
+/* Last Modified Date */
+.last-modified {
+  max-width: 1200px;
+  margin: 32px auto 0;
+  padding: 16px 24px;
+  font-size: var(--body-font-size-s);
+  color: var(--dark-color);
+  border-top: 1px solid var(--light-color);
+}
+
+@media (width >= 900px) {
+  .last-modified {
+    padding: 16px 32px;
+  }
+}
