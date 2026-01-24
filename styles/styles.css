@@ -318,6 +318,13 @@ main .section.blue a:any-link {
   color: white;
 }
 
+main .section.light-blue {
+  background-color: var(--color-light-blue);
+  color: var(--text-color);
+  margin: 0;
+  padding: 40px 0;
+}
+
 main .section.inset {
   padding-left: 20%;
   padding-right: 20%;

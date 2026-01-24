@@ -1,41 +1,135 @@
+.quote {
+  background-color: var(--background-color, #f5f5f5);
+  border: 1px solid #000;
+  border-radius: 8px;
+}
+
 .quote blockquote {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
   margin: 0 auto;
-  padding: 0 24px;
-  max-width: 900px;
+  padding: 0;
+  max-width: 1200px;
 }
 
 @media (width >= 900px) {
   .quote blockquote {
-    padding: 0 32px;
+    flex-direction: row;
+    gap: 48px;
+    align-items: stretch;
   }
 }
 
+/* Text container (left side) */
+.quote blockquote .quote-text {
+  position: relative;
+  flex: 1;
+  padding: 40px 24px;
+  padding-top: 60px;
+}
+
+@media (width >= 900px) {
+  .quote blockquote .quote-text {
+    padding: 40px;
+    padding-top: 80px;
+    padding-right: 0;
+  }
+}
+
+/* Decorative quote icon */
+.quote blockquote .quote-icon {
+  position: absolute;
+  top: -30px;
+  left: 10px;
+  width: 100px;
+  height: 100px;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media (width >= 900px) {
+  .quote blockquote .quote-icon {
+    width: 126px;
+    height: 126px;
+  }
+}
+
+/* Quotation text */
 .quote blockquote .quote-quotation {
-  font-size: 120%;
+  position: relative;
+  z-index: 1;
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: var(--text-color, #333);
 }
 
-.quote blockquote .quote-quotation > :first-child {
-  text-indent: -0.5ch;
+@media (width >= 900px) {
+  .quote blockquote .quote-quotation {
+    font-size: 1.5rem;
+  }
 }
 
+/* Remove the CSS-based quotation marks since we have the icon now */
 .quote blockquote .quote-quotation > :first-child::before,
 .quote blockquote .quote-quotation > :last-child::after {
-  line-height: 0;
+  content: none;
 }
 
-.quote blockquote .quote-quotation > :first-child::before {
-  content: "“";
-}
-
-.quote blockquote .quote-quotation > :last-child::after {
-  content: "”";
-}
-
+/* Attribution */
 .quote blockquote .quote-attribution {
-  text-align: right;
+  position: relative;
+  z-index: 1;
+  margin-top: 16px;
+  padding-left: 16px;
+  border-left: 3px solid var(--link-color, #06c);
+  text-align: left;
 }
 
 .quote blockquote .quote-attribution > :first-child::before {
-  content: "—";
-  padding-right: 0.5ch;
+  content: none;
+}
+
+.quote blockquote .quote-attribution p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.quote blockquote .quote-attribution cite {
+  display: block;
+  font-style: italic;
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+/* Photo (right side) */
+.quote blockquote .quote-photo {
+  flex-shrink: 0;
+  margin: -1px -1px -1px 0;
+  line-height: 0;
+  overflow: hidden;
+  border-radius: 0 8px 8px 0;
+}
+
+.quote blockquote .quote-photo picture,
+.quote blockquote .quote-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+@media (width >= 900px) {
+  .quote blockquote .quote-photo {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .quote blockquote .quote-photo picture,
+  .quote blockquote .quote-photo img {
+    width: 350px;
+    height: 100%;
+    min-height: 350px;
+  }
 }
