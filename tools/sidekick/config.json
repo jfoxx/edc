@@ -11,6 +11,13 @@
       "url": "/tools/form-picker/form-picker.html"
     },
     {
+      "id": "da-plugin-date-inserter",
+      "title": "Insert Date",
+      "environments": ["edit"],
+      "daLibrary": true,
+      "url": "/tools/date-inserter/date-inserter.html"
+    },
+    {
       "id": "da-plugin-demo",
       "title": "Plugin demo",
       "environments": ["edit"],
