@@ -20,6 +20,85 @@ import {
 } from './aem.js';
 
 /**
+ * Authentication Utilities
+ */
+
+/**
+ * Checks if a user is currently logged in
+ * @returns {boolean} True if user is logged in
+ */
+export function checkLoginStatus() {
+  const token = localStorage.getItem('authToken');
+  const firstName = localStorage.getItem('firstName');
+
+  if (!token || !firstName) {
+    return false;
+  }
+
+  // Check if token is expired (optional - for fake token validation)
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    if (payload.exp && Date.now() > payload.exp) {
+      // Token expired, clear storage
+      handleLogout(false);
+      return false;
+    }
+  } catch (e) {
+    // Invalid token format, still consider logged in if firstName exists
+    return !!firstName;
+  }
+
+  return true;
+}
+
+/**
+ * Gets the current user data from localStorage
+ * @returns {Object|null} User object or null if not logged in
+ */
+export function getCurrentUser() {
+  if (!checkLoginStatus()) {
+    return null;
+  }
+
+  return {
+    username: localStorage.getItem('username'),
+    firstName: localStorage.getItem('firstName'),
+    lastName: localStorage.getItem('lastName'),
+    email: localStorage.getItem('email'),
+    company: localStorage.getItem('company'),
+    phone: localStorage.getItem('phone'),
+    role: localStorage.getItem('role'),
+  };
+}
+
+/**
+ * Handles user logout
+ * @param {boolean} redirect - Whether to redirect after logout (default: true)
+ */
+export function handleLogout(redirect = true) {
+  // Clear all user-related data from localStorage
+  const userFields = [
+    'username',
+    'firstName',
+    'lastName',
+    'email',
+    'company',
+    'phone',
+    'role',
+    'authToken',
+    'loginTime',
+  ];
+
+  userFields.forEach((field) => {
+    localStorage.removeItem(field);
+  });
+
+  if (redirect) {
+    window.location.href = '/';
+  }
+}
+
+/**
  * Experimentation plugin
  */
 

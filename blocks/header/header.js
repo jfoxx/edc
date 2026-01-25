@@ -1,5 +1,6 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
+import { checkLoginStatus, getCurrentUser, handleLogout } from '../../scripts/scripts.js';
 
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
@@ -252,6 +253,79 @@ export default async function decorate(block) {
         parent.classList.remove('button-container');
       }
     });
+
+    // Add redirect parameter to sign-in links so user returns to current page after login
+    navTools.querySelectorAll('a').forEach((link) => {
+      const href = link.getAttribute('href') || '';
+      // Check if link goes to a sign-in page (common patterns)
+      if (href.includes('sign-in') || href.includes('signin') || href.includes('login')) {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const currentUrl = window.location.pathname + window.location.search;
+          const redirectParam = encodeURIComponent(currentUrl);
+          const separator = href.includes('?') ? '&' : '?';
+          window.location.href = `${href}${separator}redirect=${redirectParam}`;
+        });
+      }
+    });
+
+    // Handle logged-in state - update login dropdown to welcome message with sign out
+    if (checkLoginStatus()) {
+      const user = getCurrentUser();
+      const firstName = user?.firstName || 'User';
+
+      // Find the login item in the nav-tools list
+      const listItems = navTools.querySelectorAll('li');
+      listItems.forEach((li) => {
+        // Check the paragraph or link for login text
+        const paragraph = li.querySelector(':scope > p');
+        const topLink = li.querySelector(':scope > p > a, :scope > a');
+
+        // Get the text content to check
+        const textElement = topLink || paragraph;
+        if (!textElement) return;
+
+        const text = textElement.textContent.toLowerCase().trim();
+        const href = topLink ? (topLink.getAttribute('href') || '').toLowerCase() : '';
+
+        const isLoginItem = href.includes('sign-in') || href.includes('signin') || href.includes('login')
+            || text.includes('log in') || text.includes('login') || text.includes('sign in');
+
+        if (isLoginItem) {
+          // Update the text to welcome message
+          if (topLink) {
+            topLink.textContent = `Welcome, ${firstName}`;
+            topLink.removeAttribute('href');
+            topLink.style.cursor = 'pointer';
+          } else if (paragraph) {
+            paragraph.textContent = `Welcome, ${firstName}`;
+          }
+
+          // Find the dropdown and replace any login links with sign out
+          const dropdown = li.querySelector('ul');
+          if (dropdown) {
+            dropdown.querySelectorAll('a').forEach((dropdownLink) => {
+              const dropHref = (dropdownLink.getAttribute('href') || '').toLowerCase();
+              const dropText = dropdownLink.textContent.toLowerCase().trim();
+
+              if (dropHref.includes('sign-in') || dropHref.includes('signin') || dropHref.includes('login')
+                  || dropText.includes('log in') || dropText.includes('login') || dropText.includes('sign in')) {
+                // Replace login link with sign out
+                dropdownLink.textContent = 'Sign Out';
+                dropdownLink.href = '#';
+                dropdownLink.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  handleLogout();
+                });
+              }
+            });
+          }
+        }
+      });
+
+      // Add logged-in class to body for styling purposes
+      document.body.classList.add('logged-in');
+    }
   }
 
   const utilityRow = document.createElement('div');

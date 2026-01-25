@@ -735,3 +735,55 @@ header .nav-wrapper.simple .nav-tools > .default-content-wrapper > ul > li > p {
   display: flex;
   align-items: center;
 }
+
+/* ========================================
+   Logged-in User Controls
+   ======================================== */
+.nav-user-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.nav-welcome {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--nav-text-color);
+  white-space: nowrap;
+}
+
+.nav-logout {
+  background-color: transparent;
+  border: 1px solid var(--nav-border-color);
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--nav-text-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.nav-logout:hover {
+  border-color: var(--nav-blue);
+  color: var(--nav-blue);
+  background-color: rgb(26 101 178 / 5%);
+}
+
+/* Mobile adjustments for logged-in state */
+@media (width < 900px) {
+  .nav-user-controls {
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .nav-welcome {
+    display: none; /* Hide welcome message on mobile to save space */
+  }
+
+  .nav-logout {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
