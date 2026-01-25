@@ -147,24 +147,22 @@ async function fetchPageMetadata(path) {
     }
 
     const html = await resp.text();
-    
-    // Log first 500 chars of HTML for debugging
-    console.log(`[Stale Content] ${cleanPath}: HTML preview:`, html.substring(0, 500));
-    
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
 
-    // Find the metadata table - it's typically the last table with class "metadata"
-    // or a table where first cell contains metadata field names
-    const tables = doc.querySelectorAll('table');
     const metadata = {};
 
-    console.log(`[Stale Content] ${cleanPath}: Found ${tables.length} tables`);
+    // In DA, metadata is stored as divs with class "metadata", not tables
+    // Structure: div.metadata > div (row) > div (key) + div (value)
+    const metadataBlocks = doc.querySelectorAll('.metadata');
+    
+    console.log(`[Stale Content] ${cleanPath}: Found ${metadataBlocks.length} metadata blocks`);
 
-    tables.forEach((table, idx) => {
-      const rows = table.querySelectorAll('tr');
+    metadataBlocks.forEach((block) => {
+      // Each direct child div is a row
+      const rows = block.querySelectorAll(':scope > div');
       rows.forEach((row) => {
-        const cells = row.querySelectorAll('td, th');
+        const cells = row.querySelectorAll(':scope > div');
         if (cells.length >= 2) {
           const rawKey = cells[0].textContent.trim();
           const key = rawKey.toLowerCase().replace(/\s+/g, '-');
