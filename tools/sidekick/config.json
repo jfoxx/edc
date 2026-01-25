@@ -43,7 +43,7 @@
   "apps": [
     {
       "title": "Stale Content Finder",
-      "description": "Find content that hasn't been modified in 6+ months",
+      "description": "Find content where the last-modified metadata is older than 6+ months",
       "path": "/tools/stale-content"
     },
     {

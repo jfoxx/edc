@@ -93,37 +93,158 @@ function formatDate(timestamp) {
 
 /**
  * Calculates how many months ago a date was
- * @param {number} timestamp - Unix timestamp in milliseconds
+ * @param {number|Date} dateInput - Unix timestamp in milliseconds or Date object
  * @returns {number} Number of months ago
  */
-function monthsAgo(timestamp) {
+function monthsAgo(dateInput) {
   const now = new Date();
-  const then = new Date(timestamp);
+  const then = dateInput instanceof Date ? dateInput : new Date(dateInput);
   const months = (now.getFullYear() - then.getFullYear()) * 12
     + (now.getMonth() - then.getMonth());
   return months;
 }
 
 /**
- * Callback for the crawl utility - processes each item found
+ * Parses a date string in various formats
+ * @param {string} dateStr - Date string to parse
+ * @returns {Date|null} Parsed date or null if invalid
+ */
+function parseDate(dateStr) {
+  if (!dateStr) return null;
+
+  // Try ISO format first (YYYY-MM-DD or YYYY-MM-DDTHH:MM)
+  let date = new Date(dateStr);
+  if (!Number.isNaN(date.getTime())) return date;
+
+  // Try common formats like "January 15, 2024" or "15 Jan 2024"
+  date = new Date(Date.parse(dateStr));
+  if (!Number.isNaN(date.getTime())) return date;
+
+  return null;
+}
+
+/**
+ * Fetches the metadata for a page from DA
+ * @param {string} path - The path to the page (without .html)
+ * @returns {Promise<Object|null>} Metadata object or null
+ */
+async function fetchPageMetadata(path) {
+  const { org, site, token } = state;
+  // Remove the org/site prefix if present
+  const cleanPath = path.replace(`/${org}/${site}`, '');
+  const url = `https://admin.da.live/source/${org}/${site}${cleanPath}.html`;
+
+  try {
+    const resp = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!resp.ok) {
+      console.warn(`[Stale Content] Failed to fetch ${url}: ${resp.status}`);
+      return null;
+    }
+
+    const html = await resp.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Find the metadata table - it's typically the last table with class "metadata"
+    // or a table where first cell contains metadata field names
+    const tables = doc.querySelectorAll('table');
+    const metadata = {};
+
+    console.log(`[Stale Content] ${cleanPath}: Found ${tables.length} tables`);
+
+    tables.forEach((table, idx) => {
+      const rows = table.querySelectorAll('tr');
+      rows.forEach((row) => {
+        const cells = row.querySelectorAll('td, th');
+        if (cells.length >= 2) {
+          const rawKey = cells[0].textContent.trim();
+          const key = rawKey.toLowerCase().replace(/\s+/g, '-');
+          const value = cells[1].textContent.trim();
+          if (key && value) {
+            metadata[key] = value;
+            // Log if we find anything related to "modified" or "date"
+            if (key.includes('modif') || key.includes('date')) {
+              console.log(`[Stale Content] ${cleanPath}: Found "${rawKey}" = "${value}"`);
+            }
+          }
+        }
+      });
+    });
+
+    // Log all metadata keys found
+    const keys = Object.keys(metadata);
+    if (keys.length > 0) {
+      console.log(`[Stale Content] ${cleanPath}: Metadata keys: ${keys.join(', ')}`);
+    } else {
+      console.log(`[Stale Content] ${cleanPath}: No metadata found`);
+    }
+
+    return metadata;
+  } catch (error) {
+    console.error(`Error fetching metadata for ${path}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Collects pages during crawl
  * @param {Object} item - The item from the crawl
+ * @param {Array} pages - Array to collect pages into
+ */
+function collectPage(item, pages) {
+  // Only collect .html files (pages)
+  if (item.path.endsWith('.html')) {
+    pages.push(item);
+  }
+}
+
+/**
+ * Processes a single page to check if it's stale based on metadata
+ * @param {Object} item - The page item
  * @param {number} thresholdMonths - Number of months to consider stale
  */
-function processItem(item, thresholdMonths) {
+async function processPage(item, thresholdMonths) {
   if (state.cancelled) return;
 
   state.totalScanned += 1;
+  updateProgress(`Checking metadata: ${item.path}`, null);
+  updateStats();
 
-  // Update progress periodically (every 10 items to avoid too many DOM updates)
-  if (state.totalScanned % 10 === 0) {
-    updateProgress(`Scanning: ${item.path}`, null);
-    updateStats();
+  // Fetch the page metadata
+  const metadata = await fetchPageMetadata(item.path.replace('.html', ''));
+
+  if (!metadata) return;
+
+  // Look for last-modified metadata field (try various common names)
+  const lastModifiedValue = metadata['last-modified']
+    || metadata.lastmodified
+    || metadata['last-modified-date']
+    || metadata['lastmodifieddate']
+    || metadata['date-modified']
+    || metadata.modified;
+
+  if (!lastModifiedValue) {
+    console.log(`[Stale Content] ${item.path}: No last-modified field found`);
+    return;
   }
 
-  // Skip folders (no extension) and items without lastModified
-  if (!item.path.endsWith('.html') || !item.lastModified) return;
+  console.log(`[Stale Content] ${item.path}: last-modified = "${lastModifiedValue}"`);
+  
 
-  const months = monthsAgo(item.lastModified);
+  const lastModifiedDate = parseDate(lastModifiedValue);
+  if (!lastModifiedDate) {
+    console.warn(`[Stale Content] ${item.path}: Could not parse date "${lastModifiedValue}"`);
+    return;
+  }
+
+  console.log(`[Stale Content] ${item.path}: Parsed date = ${lastModifiedDate.toISOString()}, ${monthsAgo(lastModifiedDate)} months ago`);
+
+  const months = monthsAgo(lastModifiedDate);
   if (months >= thresholdMonths) {
     // Extract name from path
     const pathParts = item.path.split('/');
@@ -134,9 +255,12 @@ function processItem(item, thresholdMonths) {
       path: item.path.replace('.html', ''),
       name,
       ext: 'html',
-      lastModified: item.lastModified,
+      lastModified: lastModifiedDate.getTime(),
+      lastModifiedStr: lastModifiedValue,
       monthsAgo: months,
     });
+
+    renderResults();
   }
 }
 
@@ -149,22 +273,40 @@ async function scanContent(startPath, thresholdMonths) {
   const { org, site } = state;
   const path = `/${org}/${site}${startPath === '/' ? '' : startPath}`;
 
-  updateProgress(`Starting crawl at ${startPath}...`, 0);
+  updateProgress(`Discovering pages at ${startPath}...`, 0);
+
+  const pages = [];
 
   try {
+    // First, crawl to discover all pages
     const { results } = crawl({
       path,
-      callback: (item) => processItem(item, thresholdMonths),
+      callback: (item) => collectPage(item, pages),
       concurrent: 20,
     });
 
     await results;
 
+    updateProgress(`Found ${pages.length} pages. Checking metadata...`, 0);
+
+    // Now process each page to check its metadata
+    // Process in batches to avoid overwhelming the API
+    const batchSize = 5;
+    for (let i = 0; i < pages.length; i += batchSize) {
+      if (state.cancelled) break;
+
+      const batch = pages.slice(i, i + batchSize);
+      await Promise.all(batch.map((page) => processPage(page, thresholdMonths)));
+
+      const progress = Math.round(((i + batch.length) / pages.length) * 100);
+      updateProgress(`Checking metadata: ${i + batch.length}/${pages.length}`, progress);
+    }
+
     // Final update
     updateStats();
     renderResults();
   } catch (error) {
-    console.error('Crawl error:', error);
+    console.error('Scan error:', error);
     throw error;
   }
 }
@@ -200,13 +342,15 @@ function createResultItem(item) {
   const daEditUrl = `https://da.live/edit#/${org}/${site}${item.path}`;
   const previewUrl = `https://main--${site}--${org}.aem.page${item.path}`;
 
+  const displayDate = item.lastModifiedStr || formatDate(item.lastModified);
+
   li.innerHTML = `
     <input type="checkbox" class="result-checkbox" value="${item.path}" />
     <div class="result-icon">${ICONS.document}</div>
     <div class="result-info">
       <div class="result-path">${item.path}</div>
       <div class="result-meta">
-        Last modified: <span class="result-date">${formatDate(item.lastModified)}</span>
+        Metadata last-modified: <span class="result-date">${displayDate}</span>
         (${item.monthsAgo} months ago)
       </div>
     </div>
