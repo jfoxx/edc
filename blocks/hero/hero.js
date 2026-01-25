@@ -1,16 +1,37 @@
 import { getMetadata, decorateIcons } from '../../scripts/aem.js';
 
+/**
+ * Parses a date string in either ISO format (YYYY-MM-DD or YYYY-MM-DDTHH:MM) or DD/MM/YYYY format.
+ * @param {string} dateStr - The date string to parse
+ * @returns {Date|null} Parsed Date object or null if invalid
+ */
+function parseDate(dateStr) {
+  if (!dateStr) return null;
+
+  // Try ISO format first (YYYY-MM-DD or YYYY-MM-DDTHH:MM)
+  if (dateStr.includes('-') && dateStr.match(/^\d{4}-\d{2}-\d{2}/)) {
+    const date = new Date(dateStr);
+    if (!Number.isNaN(date.getTime())) return date;
+  }
+
+  // Fallback to DD/MM/YYYY format
+  const parts = dateStr.split('/');
+  if (parts.length === 3) {
+    const date = new Date(parts[2], parts[1] - 1, parts[0]);
+    if (!Number.isNaN(date.getTime())) return date;
+  }
+
+  return null;
+}
+
 function addWebinarStatus(block) {
   if (!document.body.classList.contains('webinar')) return;
 
   const rawDate = getMetadata('date');
   if (!rawDate) return;
 
-  // Parse date (DD/MM/YYYY format)
-  const parts = rawDate.split('/');
-  if (parts.length !== 3) return;
-
-  const eventDate = new Date(parts[2], parts[1] - 1, parts[0]);
+  const eventDate = parseDate(rawDate);
+  if (!eventDate) return;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 

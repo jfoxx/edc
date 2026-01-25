@@ -107,12 +107,27 @@ function buildWebinarLayout(main) {
   const defaultLocation = isFrench ? 'En ligne' : 'Online';
   const eventLocation = getMetadata('location') || defaultLocation;
 
-  // Format date based on language
+  // Parse date - supports ISO format (YYYY-MM-DD or YYYY-MM-DDTHH:MM) and DD/MM/YYYY format
   let eventDate = '';
   if (rawDate) {
-    const parts = rawDate.split('/');
-    if (parts.length === 3) {
-      const dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+    let dateObj = null;
+
+    // Try ISO format first (YYYY-MM-DD or YYYY-MM-DDTHH:MM from date-inserter plugin)
+    if (rawDate.includes('-') && rawDate.match(/^\d{4}-\d{2}-\d{2}/)) {
+      dateObj = new Date(rawDate);
+      if (Number.isNaN(dateObj.getTime())) dateObj = null;
+    }
+
+    // Fallback to DD/MM/YYYY format
+    if (!dateObj) {
+      const parts = rawDate.split('/');
+      if (parts.length === 3) {
+        dateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+        if (Number.isNaN(dateObj.getTime())) dateObj = null;
+      }
+    }
+
+    if (dateObj) {
       if (isFrench) {
         const daysFr = ['dim.', 'lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.'];
         const monthsFr = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
