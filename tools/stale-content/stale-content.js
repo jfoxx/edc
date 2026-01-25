@@ -147,6 +147,10 @@ async function fetchPageMetadata(path) {
     }
 
     const html = await resp.text();
+    
+    // Log first 500 chars of HTML for debugging
+    console.log(`[Stale Content] ${cleanPath}: HTML preview:`, html.substring(0, 500));
+    
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
 
