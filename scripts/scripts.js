@@ -413,6 +413,13 @@ function decorateSections(main) {
           section.dataset[toCamelCase(key)] = meta[key];
         }
       });
+
+      // Set section anchor/id for deep linking
+      const anchor = meta.anchor || meta.id;
+      if (anchor) {
+        section.id = toClassName(anchor);
+      }
+
       sectionMeta.parentNode.remove();
     }
   });

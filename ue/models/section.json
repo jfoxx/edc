@@ -26,6 +26,12 @@
               "value": "highlight"
             }
           ]
+        },
+        {
+          "component": "text",
+          "name": "anchor",
+          "label": "Anchor",
+          "description": "Unique ID for deep linking to this section (e.g., 'my-section' creates a link like page#my-section)"
         }
       ]
     }
