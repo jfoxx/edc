@@ -24,6 +24,33 @@ import {
  */
 
 /**
+ * Handles user logout
+ * @param {boolean} redirect - Whether to redirect after logout (default: true)
+ */
+export function handleLogout(redirect = true) {
+  // Clear all user-related data from localStorage
+  const userFields = [
+    'username',
+    'firstName',
+    'lastName',
+    'email',
+    'company',
+    'phone',
+    'role',
+    'authToken',
+    'loginTime',
+  ];
+
+  userFields.forEach((field) => {
+    localStorage.removeItem(field);
+  });
+
+  if (redirect) {
+    window.location.href = '/';
+  }
+}
+
+/**
  * Checks if a user is currently logged in
  * @returns {boolean} True if user is logged in
  */
@@ -69,33 +96,6 @@ export function getCurrentUser() {
     phone: localStorage.getItem('phone'),
     role: localStorage.getItem('role'),
   };
-}
-
-/**
- * Handles user logout
- * @param {boolean} redirect - Whether to redirect after logout (default: true)
- */
-export function handleLogout(redirect = true) {
-  // Clear all user-related data from localStorage
-  const userFields = [
-    'username',
-    'firstName',
-    'lastName',
-    'email',
-    'company',
-    'phone',
-    'role',
-    'authToken',
-    'loginTime',
-  ];
-
-  userFields.forEach((field) => {
-    localStorage.removeItem(field);
-  });
-
-  if (redirect) {
-    window.location.href = '/';
-  }
 }
 
 /**

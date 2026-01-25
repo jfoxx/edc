@@ -196,7 +196,7 @@ export default async function decorate(block) {
   // then fall back to block config, then default to home
   const urlParams = new URLSearchParams(window.location.search);
   const queryRedirect = urlParams.get('redirect');
-  const redirectUrl = queryRedirect ? decodeURIComponent(queryRedirect) : (config['redirect'] || '/');
+  const redirectUrl = queryRedirect ? decodeURIComponent(queryRedirect) : (config.redirect || '/');
 
   // Clear block content
   block.textContent = '';
