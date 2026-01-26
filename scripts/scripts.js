@@ -257,12 +257,119 @@ function autolinkModals(doc) {
 }
 
 /**
+ * Builds breadcrumb block for news pages.
+ * @param {Element} main The container element
+ */
+function buildBreadcrumbBlock(main) {
+  // Create breadcrumb section
+  const breadcrumbSection = document.createElement('div');
+  const breadcrumb = buildBlock('breadcrumb', { elems: [] });
+  breadcrumbSection.appendChild(breadcrumb);
+  main.prepend(breadcrumbSection);
+}
+
+/**
+ * Builds news article layout with dateline and release date.
+ * Splits content so H1 + dateline are in hero section, article content in body section.
+ * @param {Element} main The container element
+ */
+function buildNewsLayout(main) {
+  if (!document.body.classList.contains('news')) return;
+
+  // Add breadcrumb for news pages
+  buildBreadcrumbBlock(main);
+
+  // Get the first section (after breadcrumb)
+  const sections = main.querySelectorAll(':scope > div');
+  const firstSection = sections.length > 1 ? sections[1] : sections[0];
+  if (!firstSection) return;
+
+  // Get metadata
+  const dateline = getMetadata('dateline');
+  const releaseDate = getMetadata('release-date');
+
+  // Find the H1
+  const h1 = firstSection.querySelector('h1');
+  if (!h1) return;
+
+  // Create news header with dateline and date
+  const newsHeader = document.createElement('div');
+  newsHeader.classList.add('news-header');
+
+  if (releaseDate && dateline) {
+    newsHeader.innerHTML = `<p class="news-dateline">${releaseDate} ${dateline}</p>`;
+  } else if (releaseDate) {
+    newsHeader.innerHTML = `<p class="news-dateline">${releaseDate}</p>`;
+  } else if (dateline) {
+    newsHeader.innerHTML = `<p class="news-dateline">${dateline}</p>`;
+  }
+
+  // Get all content after H1 (this will become the article body section)
+  const contentWrapper = firstSection.querySelector('.default-content-wrapper');
+  if (!contentWrapper) return;
+
+  // Collect all elements after H1 for the body section
+  const bodyElements = [];
+  let foundH1 = false;
+  let skipNewsHeader = false;
+
+  [...contentWrapper.children].forEach((child) => {
+    if (child === h1) {
+      foundH1 = true;
+      return;
+    }
+    if (foundH1) {
+      // Skip the first paragraph if it matches dateline pattern (already in metadata)
+      if (!skipNewsHeader && child.tagName === 'P') {
+        const text = child.textContent.trim();
+        // Check if this paragraph is just the dateline info we already have
+        if (dateline && releaseDate && text.includes(dateline) && text.includes(releaseDate)) {
+          skipNewsHeader = true;
+          return;
+        }
+        if (text.match(/^[A-Z]+,?\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}$/i)) {
+          skipNewsHeader = true;
+          return;
+        }
+      }
+      bodyElements.push(child);
+    }
+  });
+
+  // Create new body section for article content
+  if (bodyElements.length > 0) {
+    const bodySection = document.createElement('div');
+    bodySection.classList.add('section');
+    bodySection.dataset.sectionStatus = 'initialized';
+
+    const bodyWrapper = document.createElement('div');
+    bodyWrapper.classList.add('default-content-wrapper');
+
+    bodyElements.forEach((el) => bodyWrapper.appendChild(el));
+    bodySection.appendChild(bodyWrapper);
+
+    // Insert body section after the hero section
+    firstSection.after(bodySection);
+  }
+
+  // Keep only H1 and news header in first section
+  contentWrapper.innerHTML = '';
+  contentWrapper.appendChild(h1);
+  if (newsHeader.innerHTML) {
+    contentWrapper.appendChild(newsHeader);
+  }
+}
+
+/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
 function buildAutoBlocks(main) {
   try {
-    if (!main.querySelector('.hero')) buildHeroBlock(main);
+    // Skip hero block for news pages - they have their own layout
+    if (!main.querySelector('.hero') && !document.body.classList.contains('news')) {
+      buildHeroBlock(main);
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
@@ -472,6 +579,7 @@ async function loadEager(doc) {
     decorateMain(main);
     buildLayoutContainer(main);
     buildWebinarLayout(main);
+    buildNewsLayout(main);
     doc.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
   }
