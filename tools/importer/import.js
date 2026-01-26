@@ -851,10 +851,12 @@ function createMetadata(document, main) {
     meta.Image = img;
   }
 
-  // Keywords/Tags
+  // Keywords/Tags - leave blank if null or 'null' string
   const keywords = document.querySelector('meta[name="keywords"]');
-  if (keywords) {
+  if (keywords && keywords.content && keywords.content.toLowerCase() !== 'null') {
     meta.Tags = keywords.content;
+  } else {
+    meta.Tags = '';
   }
 
   // Author
@@ -925,6 +927,135 @@ function cleanupLinks(document, main, originalUrl) {
       // Keep original href if URL parsing fails
     }
   });
+}
+
+/**
+ * Check if URL is a news page
+ * @param {string} url - The page URL
+ * @returns {boolean} true if news page
+ */
+function isNewsPage(url) {
+  return url.includes('/news/');
+}
+
+/**
+ * Transform news page - simplified single-column layout
+ * Collects H1 and .article-body, rest is metadata
+ * @param {Document} document - The document object
+ * @param {Element} main - The main content element
+ * @param {string} url - The page URL
+ */
+function transformNewsPage(document, main, url) {
+  // Remove news-specific unwanted elements
+  WebImporter.DOMUtils.remove(main, [
+    '.recommended-articles-premium-wrapper',
+  ]);
+
+  // Create a new container for the simplified content
+  const newsContent = document.createElement('div');
+
+  // Get the H1 - search in main first, then fall back to full document
+  const h1 = main.querySelector('h1') || document.querySelector('h1');
+  if (h1) {
+    newsContent.appendChild(h1.cloneNode(true));
+  }
+
+  // Get the article body - search in main first, then fall back to full document
+  const articleBody = main.querySelector('.article-body') || document.querySelector('.article-body');
+  if (articleBody) {
+    // Clone the article body content
+    const bodyClone = articleBody.cloneNode(true);
+    // Append all children of article body
+    while (bodyClone.firstChild) {
+      newsContent.appendChild(bodyClone.firstChild);
+    }
+  }
+
+  // Clear main and add the news content
+  main.innerHTML = '';
+  while (newsContent.firstChild) {
+    main.appendChild(newsContent.firstChild);
+  }
+
+  // Create news-specific metadata
+  createNewsMetadata(document, main);
+}
+
+/**
+ * Create metadata block for news pages with template='news'
+ * @param {Document} document - The document object
+ * @param {Element} main - The main content element
+ * @returns {Object} metadata object
+ */
+function createNewsMetadata(document, main) {
+  const meta = {};
+
+  // Title - prefer <title> tag
+  const title = document.querySelector('title');
+  if (title) {
+    meta.Title = title.textContent.replace(/\s*\|.*$/, '').trim();
+  }
+
+  // Description
+  const descMeta = document.querySelector('meta[name="description"]');
+  if (descMeta) {
+    meta.Description = descMeta.content;
+  }
+
+  // OG Image
+  const ogImage = document.querySelector('meta[property="og:image"]');
+  if (ogImage && ogImage.content) {
+    const img = document.createElement('img');
+    img.src = ogImage.content;
+    meta.Image = img;
+  }
+
+  // Keywords/Tags - leave blank if null or 'null' string
+  const keywords = document.querySelector('meta[name="keywords"]');
+  if (keywords && keywords.content && keywords.content.toLowerCase() !== 'null') {
+    meta.Tags = keywords.content;
+  } else {
+    meta.Tags = '';
+  }
+
+  // Author
+  const author = document.querySelector('meta[name="author"]');
+  if (author) {
+    meta.Author = author.content;
+  }
+
+  // Dateline - location from which the article was published
+  const dateline = document.querySelector('.headersection span.location');
+  if (dateline && dateline.textContent.trim()) {
+    meta.Dateline = dateline.textContent.trim();
+  }
+
+  // Release Date - from header section
+  const releaseDate = document.querySelector('.headersection span.date');
+  if (releaseDate && releaseDate.textContent.trim()) {
+    meta['Release Date'] = releaseDate.textContent.trim();
+  }
+
+  // Publication date (fallback from meta tag)
+  const pubDate = document.querySelector('meta[name="publication-date"], meta[property="article:published_time"]');
+  if (pubDate) {
+    meta['Publication Date'] = pubDate.content;
+  }
+
+  // Modified date - from page content
+  const modifiedText = document.body.textContent.match(/Date modified:\s*(\d{4}-\d{2}-\d{2})/);
+  if (modifiedText) {
+    meta['Last Modified'] = modifiedText[1];
+  }
+
+  // Set template to news
+  meta.Template = 'news';
+
+  // Create and append metadata block
+  const block = WebImporter.Blocks.getMetadataBlock(document, meta);
+  main.appendChild(block);
+
+  return meta;
 }
 
 /**
@@ -1006,6 +1137,16 @@ export default {
     // Handle images first
     handleImages(document, main);
 
+    // Check if this is a news page - use simplified single-column transformation
+    const originalUrl = params.originalURL || url;
+    if (isNewsPage(originalUrl)) {
+      // News pages: H1 + article-body only, no columns, template='news'
+      transformNewsPage(document, main, originalUrl);
+      cleanupLinks(document, main, originalUrl);
+      return main;
+    }
+
+    // Standard page transformation below
     // Create blocks from content patterns
     createHeroBlock(document, main);
     createCardTabsBlock(document, main);
@@ -1023,7 +1164,6 @@ export default {
     createSectionBreaks(document, main);
 
     // Clean up links
-    const originalUrl = params.originalURL || url;
     cleanupLinks(document, main, originalUrl);
 
     // Create metadata block (should be last)

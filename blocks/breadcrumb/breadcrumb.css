@@ -1,0 +1,56 @@
+/* Breadcrumb Block */
+.breadcrumb-container {
+  padding: 8px 24px;
+  background-color: var(--background-color);
+}
+
+.breadcrumb nav {
+  font-size: var(--body-font-size-xs);
+  color: var(--dark-color);
+}
+
+.breadcrumb .breadcrumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+}
+
+.breadcrumb .breadcrumb-list li {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb .breadcrumb-list a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.breadcrumb .breadcrumb-list a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb .breadcrumb-separator {
+  margin: 0 8px;
+  color: var(--dark-color);
+}
+
+.breadcrumb .breadcrumb-list span[aria-current="page"] {
+  color: var(--dark-color);
+}
+
+@media (width >= 900px) {
+  .breadcrumb-container {
+    padding: 8px 32px;
+  }
+}
+
+/* News template breadcrumb positioning */
+body.news .breadcrumb-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding-top: 16px;
+}
