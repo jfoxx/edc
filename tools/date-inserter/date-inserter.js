@@ -1,7 +1,5 @@
 /* eslint-disable import/no-unresolved */
 
-import DA_SDK from 'https://da.live/nx/utils/sdk.js';
-
 /**
  * Gets current date and time in ISO format (YYYY-MM-DDTHH:MM)
  * @returns {string} Current date and time in ISO format
@@ -47,35 +45,32 @@ const mockActions = {
     // eslint-disable-next-line no-alert
     alert(`Inserted: ${text}`);
   },
-  closeLibrary: () => {
-    // eslint-disable-next-line no-console
-    console.log('closeLibrary called');
-  },
 };
 
 /**
- * Inserts text and closes the library
+ * Inserts text and displays errors
  * @param {Object} actions - DA SDK actions
  * @param {string} text - Text to insert
  * @param {HTMLElement} feedback - Feedback element
  */
-function insertText(actions, text, feedback) {
+async function insertText(actions, text, feedback) {
   if (!actions?.sendText) {
     feedback.textContent = 'Cannot insert: Editor not available';
     feedback.classList.add('error');
-    feedback.classList.remove('success');
     return;
   }
 
-  actions.sendText(text);
-  feedback.textContent = 'Inserted!';
-  feedback.classList.add('success');
+  try {
+    await actions.sendText(text);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Date Inserter could not insert text', error);
+    feedback.textContent = 'Could not insert the date. Please try again.';
+    feedback.classList.add('error');
+    return;
+  }
+  feedback.textContent = '';
   feedback.classList.remove('error');
-
-  // Close library after short delay
-  setTimeout(() => {
-    actions.closeLibrary();
-  }, 500);
 }
 
 /**
@@ -84,15 +79,6 @@ function insertText(actions, text, feedback) {
 (async function init() {
   let actions;
 
-  if (isStandalone()) {
-    // eslint-disable-next-line no-console
-    console.log('Date Inserter running in standalone mode (testing)');
-    actions = mockActions;
-  } else {
-    const sdk = await DA_SDK;
-    actions = sdk.actions;
-  }
-
   const todayDisplay = document.getElementById('today-date');
   const insertTodayBtn = document.getElementById('insert-today-btn');
   const datePicker = document.getElementById('date-picker');
@@ -100,9 +86,36 @@ function insertText(actions, text, feedback) {
   const insertCustomBtn = document.getElementById('insert-custom-btn');
   const feedback = document.getElementById('feedback');
 
+  try {
+    await import('https://da.live/nx/public/sl/components.js');
+    await Promise.all([
+      customElements.whenDefined('sl-input'),
+      customElements.whenDefined('sl-button'),
+    ]);
+    document.body.classList.remove('sl-loading');
+    if (isStandalone()) {
+      actions = mockActions;
+    } else {
+      const { default: sdk } = await import('https://da.live/nx/utils/sdk.js');
+      ({ actions } = await sdk);
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Date Inserter could not initialize the DA SDK', error);
+    document.body.classList.remove('sl-loading');
+    document.body.classList.add('sdk-error');
+    feedback.textContent = 'Could not load the DA SDK. Please reload the plugin.';
+    feedback.classList.add('error');
+    return;
+  }
+
+  insertTodayBtn.removeAttribute('disabled');
+
   // Display current date/time and update every minute
   function updateNowDisplay() {
-    todayDisplay.textContent = getNowISO();
+    const now = getNowISO();
+    todayDisplay.textContent = now;
+    todayDisplay.dateTime = now;
   }
   updateNowDisplay();
   setInterval(updateNowDisplay, 60000);
@@ -114,15 +127,17 @@ function insertText(actions, text, feedback) {
 
   // Update button state when inputs change
   function updateButtonState() {
-    insertCustomBtn.disabled = !datePicker.value;
+    insertCustomBtn.toggleAttribute('disabled', !datePicker.value || !timePicker.validity.valid);
   }
 
   datePicker.addEventListener('input', updateButtonState);
+  datePicker.addEventListener('change', updateButtonState);
   timePicker.addEventListener('input', updateButtonState);
+  timePicker.addEventListener('change', updateButtonState);
 
   // Insert custom date/time on button click
   insertCustomBtn.addEventListener('click', () => {
-    if (datePicker.value) {
+    if (!insertCustomBtn.disabled) {
       const formatted = formatDateTime(datePicker.value, timePicker.value);
       insertText(actions, formatted, feedback);
     }
@@ -130,7 +145,7 @@ function insertText(actions, text, feedback) {
 
   // Allow pressing Enter to insert
   function handleEnter(e) {
-    if (e.key === 'Enter' && datePicker.value) {
+    if (e.key === 'Enter' && !insertCustomBtn.disabled) {
       e.preventDefault();
       const formatted = formatDateTime(datePicker.value, timePicker.value);
       insertText(actions, formatted, feedback);
