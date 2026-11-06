@@ -1,0 +1,4 @@
+[     541ms] [ERROR] Date Inserter could not insert text Error: Test failure
+    at Object.sendText (https://da.live/nx/utils/sdk.js:1:107)
+    at insertText (http://127.0.0.1:3001/tools/date-inserter/date-inserter.js:64:19)
+    at HTMLElement.<anonymous> (http://127.0.0.1:3001/tools/date-inserter/date-inserter.js:142:7) @ http://127.0.0.1:3001/tools/date-inserter/date-inserter.js:66

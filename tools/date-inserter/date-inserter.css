@@ -1,0 +1,172 @@
+.date-inserter-page {
+  --sl-field-height: 36px;
+  --sl-field-font-size: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body.date-inserter-page {
+  margin: 0;
+  padding: 20px;
+  background: var(--s2-gray-75, #f3f3f3);
+  color: var(--s2-gray-800, #292929);
+  font-family: var(--font-family, system-ui, sans-serif);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+body.date-inserter-page.sl-loading {
+  display: none;
+}
+
+.date-inserter {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.plugin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 4px;
+}
+
+.plugin-header img {
+  flex-shrink: 0;
+}
+
+.plugin-header h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.plugin-header p,
+.field-hint {
+  margin: 4px 0 0;
+  color: var(--s2-gray-700, #505050);
+  font-size: 13px;
+}
+
+.date-card {
+  padding: 20px;
+  border: 1px solid var(--s2-gray-200, #e1e1e1);
+  border-radius: var(--s2-radius-300, 16px);
+  background: #fff;
+}
+
+.date-card h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.date-preview {
+  display: block;
+  margin: 16px 0;
+  padding: 12px;
+  border-radius: var(--s2-radius-100, 8px);
+  background: var(--s2-gray-75, #f3f3f3);
+  font-family: var(--fixed-family, monospace);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.date-card sl-button {
+  margin-top: 16px;
+}
+
+.date-card sl-button::part(wrap) {
+  display: block;
+}
+
+.date-card sl-button::part(base) {
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--s2-gray-700, #505050);
+  font-size: 13px;
+}
+
+.divider::before,
+.divider::after {
+  flex: 1;
+  height: 1px;
+  background: var(--s2-gray-200, #e1e1e1);
+  content: '';
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  margin: 16px 0 8px;
+}
+
+.input-row sl-input,
+.time-field {
+  min-width: 0;
+}
+
+.time-field label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--s2-gray-700, #505050);
+  font-size: var(--s2-body-xs-size, 15px);
+}
+
+.time-field label span {
+  font-size: 12px;
+}
+
+.time-field input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  line-height: var(--sl-field-height);
+  padding: 0 12px;
+  border: var(--sl-field-border, 2px solid #dadada);
+  border-radius: var(--s2-radius-100, 8px);
+  background: #fff;
+  color: inherit;
+  font-family: var(--font-family, system-ui, sans-serif);
+  font-size: var(--sl-field-font-size);
+}
+
+.time-field input:focus-visible {
+  outline: 2px solid var(--s2-blue-900, #3b63fb);
+  outline-offset: 4px;
+}
+
+.feedback {
+  min-height: 21px;
+  margin: 0;
+  color: var(--s2-gray-700, #505050);
+  font-size: 13px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.feedback.error {
+  color: var(--s2-red-1000, #b40000);
+}
+
+@media (width >= 400px) {
+  .input-row {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+}
