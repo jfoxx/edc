@@ -1,18 +1,6 @@
 /* eslint-disable import/no-unresolved */
 
-/**
- * Gets current date and time in ISO format (YYYY-MM-DDTHH:MM)
- * @returns {string} Current date and time in ISO format
- */
-function getNowISO() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
+import initDateCalendar, { formatISODate, getToday, parseISODate } from './date-calendar.js';
 
 /**
  * Formats date and optional time into ISO format
@@ -79,8 +67,6 @@ async function insertText(actions, text, feedback) {
 (async function init() {
   let actions;
 
-  const todayDisplay = document.getElementById('today-date');
-  const insertTodayBtn = document.getElementById('insert-today-btn');
   const datePicker = document.getElementById('date-picker');
   const timePicker = document.getElementById('time-picker');
   const insertCustomBtn = document.getElementById('insert-custom-btn');
@@ -109,26 +95,25 @@ async function insertText(actions, text, feedback) {
     return;
   }
 
-  insertTodayBtn.removeAttribute('disabled');
-
-  // Display current date/time and update every minute
-  function updateNowDisplay() {
-    const now = getNowISO();
-    todayDisplay.textContent = now;
-    todayDisplay.dateTime = now;
-  }
-  updateNowDisplay();
-  setInterval(updateNowDisplay, 60000);
-
-  // Insert current date/time on button click
-  insertTodayBtn.addEventListener('click', () => {
-    insertText(actions, getNowISO(), feedback);
-  });
+  datePicker.value = formatISODate(getToday());
+  timePicker.value = '';
+  initDateCalendar(
+    datePicker,
+    document.getElementById('calendar-trigger'),
+    document.getElementById('date-calendar'),
+  );
 
   // Update button state when inputs change
   function updateButtonState() {
-    insertCustomBtn.toggleAttribute('disabled', !datePicker.value || !timePicker.validity.valid);
+    const invalidDate = !!datePicker.value && !parseISODate(datePicker.value);
+    datePicker.setAttribute('aria-invalid', String(invalidDate));
+    datePicker.error = invalidDate ? 'Enter a valid date (YYYY-MM-DD).' : '';
+    insertCustomBtn.toggleAttribute(
+      'disabled',
+      !parseISODate(datePicker.value) || !timePicker.validity.valid,
+    );
   }
+  updateButtonState();
 
   datePicker.addEventListener('input', updateButtonState);
   datePicker.addEventListener('change', updateButtonState);

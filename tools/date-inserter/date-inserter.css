@@ -68,18 +68,6 @@ body.date-inserter-page.sl-loading {
   line-height: 1.5;
 }
 
-.date-preview {
-  display: block;
-  margin: 16px 0;
-  padding: 12px;
-  border-radius: var(--s2-radius-100, 8px);
-  background: var(--s2-gray-75, #f3f3f3);
-  font-family: var(--fixed-family, monospace);
-  font-size: 16px;
-  font-variant-numeric: tabular-nums;
-  overflow-wrap: anywhere;
-}
-
 .date-card sl-button {
   margin-top: 16px;
 }
@@ -94,22 +82,6 @@ body.date-inserter-page.sl-loading {
   min-height: 40px;
 }
 
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--s2-gray-700, #505050);
-  font-size: 13px;
-}
-
-.divider::before,
-.divider::after {
-  flex: 1;
-  height: 1px;
-  background: var(--s2-gray-200, #e1e1e1);
-  content: '';
-}
-
 .input-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -118,8 +90,169 @@ body.date-inserter-page.sl-loading {
 }
 
 .input-row sl-input,
+.date-field,
 .time-field {
   min-width: 0;
+}
+
+.date-entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px;
+  align-items: start;
+  gap: 6px;
+}
+
+.calendar-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  margin-top: calc(var(--s2-body-xs-size, 15px) * 1.5 + 4px);
+  padding: 0;
+  border: var(--sl-field-border, 2px solid #dadada);
+  border-radius: var(--s2-radius-100, 8px);
+  background: #fff;
+  color: inherit;
+  cursor: pointer;
+}
+
+.calendar-trigger:hover,
+.calendar-trigger[aria-expanded="true"] {
+  background: var(--s2-gray-75, #f3f3f3);
+}
+
+.calendar-trigger:disabled {
+  color: var(--s2-gray-500, #8f8f8f);
+  cursor: default;
+}
+
+.date-calendar {
+  max-width: 320px;
+  margin: 12px auto;
+  padding: 12px;
+  border: 1px solid var(--s2-gray-200, #e1e1e1);
+  border-radius: var(--s2-radius-300, 16px);
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+}
+
+.date-calendar[hidden] {
+  display: none;
+}
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.calendar-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.calendar-nav,
+.calendar-day,
+.calendar-footer button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+}
+
+.calendar-grid {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 13px;
+}
+
+.calendar-grid th {
+  padding: 0 0 8px;
+  color: var(--s2-gray-700, #505050);
+  font-weight: 400;
+  text-align: center;
+}
+
+.calendar-grid td {
+  height: 36px;
+  padding: 2px;
+  text-align: center;
+}
+
+.calendar-day {
+  display: block;
+  width: 100%;
+  max-width: 32px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  border-radius: 50%;
+  font-variant-numeric: tabular-nums;
+}
+
+.calendar-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--s2-gray-200, #e1e1e1);
+}
+
+.calendar-footer button {
+  padding: 4px 8px;
+  border-radius: var(--s2-radius-100, 8px);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.calendar-nav:hover,
+.calendar-day:hover,
+.calendar-footer button:hover {
+  background: var(--s2-gray-100, #e9e9e9);
+}
+
+.calendar-day[aria-current="date"] {
+  font-weight: 700;
+}
+
+.calendar-day.selected {
+  background: var(--s2-blue-900, #3b63fb);
+  color: #fff;
+  font-weight: 700;
+  text-decoration-color: currentcolor;
+}
+
+.calendar-day.selected:hover {
+  background: var(--s2-blue-1000, #274dea);
+}
+
+.calendar-trigger:focus-visible,
+.calendar-nav:focus-visible,
+.calendar-day:focus-visible,
+.calendar-footer button:focus-visible {
+  outline: 2px solid var(--s2-blue-900, #3b63fb);
+  outline-offset: 2px;
+}
+
+.calendar-nav:disabled {
+  color: var(--s2-gray-400, #c6c6c6);
+  cursor: default;
 }
 
 .time-field label {
@@ -137,7 +270,7 @@ body.date-inserter-page.sl-loading {
   display: block;
   width: 100%;
   min-width: 0;
-  line-height: var(--sl-field-height);
+  height: calc(var(--sl-field-height) + 4px);
   padding: 0 12px;
   border: var(--sl-field-border, 2px solid #dadada);
   border-radius: var(--s2-radius-100, 8px);
