@@ -74,7 +74,7 @@ export default function initTimePicker(input, trigger, popup) {
   });
 
   popup.addEventListener('click', (event) => {
-    const button = event.target.closest('button');
+    const button = event.target.closest('button, sl-button');
     if (!button) return;
     if (button.dataset.timeAction === 'done') {
       apply(`${pad(hour)}:${pad(minute)}`);

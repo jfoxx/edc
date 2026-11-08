@@ -12,7 +12,8 @@ Do your authors need to insert dates into certain blocks like a countdown clock?
 ## UI
 
 The plugin loads the evergreen [Experience Workspace UI SDK](https://www.aem.live/docs/ew/developing/sdk-ui-components)
-and uses `sl-input` for the ISO date field and `sl-button` for insertion. Layout uses
+and uses `sl-input` for the ISO date field and `sl-button` for insertion,
+the calendar's Today and Clear actions, and the time picker's Done and Clear actions. Layout uses
 the SDK's Spectrum 2 color, corner, typography, and field tokens.
 Typography uses the SDK's font stack with locally available fonts.
 The optional time uses a labelled native input styled with the same tokens,

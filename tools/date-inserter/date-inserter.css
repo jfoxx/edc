@@ -68,7 +68,7 @@ body.date-inserter-page.sl-loading {
   line-height: 1.5;
 }
 
-.date-card sl-button {
+.date-card > sl-button {
   margin-top: 16px;
 }
 
@@ -76,7 +76,7 @@ body.date-inserter-page.sl-loading {
   display: block;
 }
 
-.date-card sl-button::part(base) {
+.date-card > sl-button::part(base) {
   align-items: center;
   width: 100%;
   min-height: 40px;
@@ -170,8 +170,7 @@ body.date-inserter-page.sl-loading {
 }
 
 .calendar-nav,
-.calendar-day,
-.calendar-footer button {
+.calendar-day {
   padding: 0;
   border: none;
   background: transparent;
@@ -228,16 +227,8 @@ body.date-inserter-page.sl-loading {
   border-top: 1px solid var(--s2-gray-200, #e1e1e1);
 }
 
-.calendar-footer button {
-  padding: 4px 8px;
-  border-radius: var(--s2-radius-100, 8px);
-  font-size: 13px;
-  font-weight: 700;
-}
-
 .calendar-nav:hover,
-.calendar-day:hover,
-.calendar-footer button:hover {
+.calendar-day:hover {
   background: var(--s2-gray-100, #e9e9e9);
 }
 
@@ -259,8 +250,7 @@ body.date-inserter-page.sl-loading {
 .calendar-trigger:focus-visible,
 .time-trigger:focus-visible,
 .calendar-nav:focus-visible,
-.calendar-day:focus-visible,
-.calendar-footer button:focus-visible {
+.calendar-day:focus-visible {
   outline: 2px solid var(--s2-blue-900, #3b63fb);
   outline-offset: 2px;
 }
@@ -405,35 +395,7 @@ body.date-inserter-page.sl-loading {
   border-top: 1px solid var(--s2-gray-200, #e1e1e1);
 }
 
-.time-clear,
-.time-done {
-  min-height: 32px;
-  padding: 4px 12px;
-  border: none;
-  border-radius: var(--s2-border-radius, 16px);
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.time-clear:hover {
-  background: var(--s2-gray-100, #e9e9e9);
-}
-
-.time-done {
-  background: var(--s2-blue-900, #3b63fb);
-  color: #fff;
-}
-
-.time-done:hover {
-  background: var(--s2-blue-1000, #274dea);
-}
-
-.time-option:focus-visible,
-.time-clear:focus-visible,
-.time-done:focus-visible {
+.time-option:focus-visible {
   outline: 2px solid var(--s2-blue-900, #3b63fb);
   outline-offset: 2px;
 }

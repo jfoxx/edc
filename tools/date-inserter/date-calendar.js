@@ -112,7 +112,7 @@ export default function initDateCalendar(datePicker, trigger, calendar) {
   });
 
   calendar.addEventListener('click', (event) => {
-    const button = event.target.closest('button');
+    const button = event.target.closest('button, sl-button');
     if (!button) return;
     if (button.dataset.date) {
       select(button.dataset.date);
