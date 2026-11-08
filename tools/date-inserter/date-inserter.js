@@ -1,6 +1,7 @@
 /* eslint-disable import/no-unresolved */
 
 import initDateCalendar, { formatISODate, getToday, parseISODate } from './date-calendar.js';
+import initTimePicker from './time-picker.js';
 
 /**
  * Formats date and optional time into ISO format
@@ -101,6 +102,11 @@ async function insertText(actions, text, feedback) {
     datePicker,
     document.getElementById('calendar-trigger'),
     document.getElementById('date-calendar'),
+  );
+  initTimePicker(
+    timePicker,
+    document.getElementById('time-trigger'),
+    document.getElementById('time-popup'),
   );
 
   // Update button state when inputs change

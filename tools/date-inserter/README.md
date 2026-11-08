@@ -16,7 +16,21 @@ and uses `sl-input` for the ISO date field and `sl-button` for insertion. Layout
 the SDK's Spectrum 2 color, corner, typography, and field tokens.
 Typography uses the SDK's font stack with locally available fonts.
 The optional time uses a labelled native input styled with the same tokens,
-because the SDK currently does not style `type="time"`.
+because the SDK currently does not style `type="time"`. Its editable time
+segments have Spectrum-style focus treatment. Keyboard entry and 12/24-hour
+presentation remain browser-native.
+
+The inset clock button opens a lightweight time popup with the same rounded
+panel and circular blue selections as the calendar. Choose an hour, minute
+(all 60 minutes are available), and AM/PM, then use Done to apply the time.
+Opening the popup or changing its selections does not fill the optional field
+until Done is used. Clear removes the time without changing the date. Escape,
+tabbing or clicking outside cancels unapplied changes. Arrow keys and Home/End
+move within a column; Enter or Space selects a value.
+
+Date and time stay stacked at every window width. The calendar button is inset
+inside the date field, and its calendar opens immediately below that field,
+before the optional time field.
 
 The date field accepts `YYYY-MM-DD` or a single date selected from the calendar.
 Selecting a day fills the field, but does not insert into the document.
@@ -37,6 +51,6 @@ UI components as experimental.
 Lint the plugin:
 
 ```sh
-npx eslint --no-ignore tools/date-inserter/date-inserter.js tools/date-inserter/date-calendar.js
+npx eslint --no-ignore tools/date-inserter/date-inserter.js tools/date-inserter/date-calendar.js tools/date-inserter/time-picker.js
 npx stylelint tools/date-inserter/date-inserter.css
 ```

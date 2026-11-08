@@ -172,10 +172,12 @@ export default function initDateCalendar(datePicker, trigger, calendar) {
 
   const dateField = trigger.closest('.date-field');
   function dismissOutside(event) {
+    // Finish pointer clicks before collapsing the in-flow popup.
+    if (event.type === 'focusin' && event.target.matches(':active')) return;
     if (!calendar.hidden && !calendar.contains(event.target)
       && !dateField.contains(event.target)) close();
   }
-  document.addEventListener('pointerdown', dismissOutside);
+  document.addEventListener('click', dismissOutside);
   document.addEventListener('focusin', dismissOutside);
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !calendar.hidden) {
