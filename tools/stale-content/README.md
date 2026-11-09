@@ -9,6 +9,8 @@ oldest-first results, edit and preview links, and CSV export of all or selected
 results. Selection is retained while results arrive and reset on a new scan.
 Missing or unparseable modification metadata is skipped.
 
+Both CSV exports include `Path`, `Name`, `Last Modified`, and `Months Ago` columns.
+
 ## UI
 
 The app loads the experimental, evergreen

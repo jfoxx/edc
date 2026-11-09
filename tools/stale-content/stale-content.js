@@ -480,11 +480,10 @@ function exportCSV(selectedOnly = false) {
     return;
   }
 
-  const headers = ['Path', 'Name', 'Extension', 'Last Modified', 'Months Ago'];
+  const headers = ['Path', 'Name', 'Last Modified', 'Months Ago'];
   const rows = itemsToExport.map((item) => [
     item.path,
     item.name,
-    item.ext,
     formatDate(item.lastModified),
     item.monthsAgo,
   ]);
