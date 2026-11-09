@@ -1,9 +1,5 @@
 /* eslint-disable import/no-unresolved */
 
-import DA_SDK from 'https://da.live/nx/utils/sdk.js';
-// eslint-disable-next-line import/no-unresolved
-import { crawl } from 'https://da.live/nx/public/utils/tree.js';
-
 // Icons
 const ICONS = {
   document: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" fill="currentColor">
@@ -36,6 +32,7 @@ const state = {
  * DOM element references
  */
 let elements = {};
+let messageTimeout;
 
 /**
  * Shows a feedback message
@@ -44,12 +41,15 @@ let elements = {};
  */
 function showMessage(text, type = '') {
   const { messageWrapper, feedback } = elements;
+  clearTimeout(messageTimeout);
   feedback.textContent = text;
   feedback.className = `feedback-message ${type}`;
+  feedback.setAttribute('role', type === 'error' ? 'alert' : 'status');
+  feedback.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
   messageWrapper.classList.remove('hidden');
 
   if (type !== 'error') {
-    setTimeout(() => {
+    messageTimeout = setTimeout(() => {
       messageWrapper.classList.add('hidden');
     }, 4000);
   }
@@ -61,10 +61,14 @@ function showMessage(text, type = '') {
  * @param {number} percent - Progress percentage (0-100)
  */
 function updateProgress(text, percent = null) {
-  const { progressText, progressFill } = elements;
+  const { progressText, progressFill, progressBar } = elements;
   progressText.textContent = text;
   if (percent !== null) {
-    progressFill.style.width = `${Math.min(100, percent)}%`;
+    const value = Math.max(0, Math.min(100, percent));
+    progressFill.style.width = `${value}%`;
+    progressBar.setAttribute('aria-valuenow', String(value));
+  } else {
+    progressBar.removeAttribute('aria-valuenow');
   }
 }
 
@@ -280,6 +284,7 @@ async function scanContent(startPath, thresholdMonths) {
   const pages = [];
 
   try {
+    const { crawl } = await import('https://da.live/nx/public/utils/tree.js');
     // First, crawl to discover all pages
     const { results } = crawl({
       path,
@@ -347,27 +352,37 @@ function createResultItem(item) {
   const displayDate = item.lastModifiedStr || formatDate(item.lastModified);
 
   li.innerHTML = `
-    <input type="checkbox" class="result-checkbox" value="${item.path}" />
-    <div class="result-icon">${ICONS.document}</div>
+    <input type="checkbox" class="result-checkbox" />
+    <div class="result-icon" aria-hidden="true">${ICONS.document}</div>
     <div class="result-info">
-      <div class="result-path">${item.path}</div>
+      <div class="result-path"></div>
       <div class="result-meta">
-        Metadata last-modified: <span class="result-date">${displayDate}</span>
+        Metadata last-modified: <span class="result-date"></span>
         (${item.monthsAgo} months ago)
       </div>
     </div>
     <div class="result-actions">
-      <button class="result-action-btn" title="Edit in DA" data-action="edit" data-url="${daEditUrl}">
-        ${ICONS.edit}
-      </button>
-      <button class="result-action-btn" title="Preview" data-action="preview" data-url="${previewUrl}">
-        ${ICONS.openIn}
-      </button>
+      <sl-button type="button" class="primary outline icon-only result-action-btn" title="Edit in Experience Workspace" data-action="edit">
+        <span aria-hidden="true">${ICONS.edit}</span>
+      </sl-button>
+      <sl-button type="button" class="primary outline icon-only result-action-btn" title="Preview" data-action="preview">
+        <span aria-hidden="true">${ICONS.openIn}</span>
+      </sl-button>
     </div>
   `;
 
   // Add checkbox change handler
   const checkbox = li.querySelector('.result-checkbox');
+  checkbox.value = item.path;
+  checkbox.setAttribute('aria-label', `Select ${item.path}`);
+  li.querySelector('.result-path').textContent = item.path;
+  li.querySelector('.result-date').textContent = displayDate;
+  const editButton = li.querySelector('[data-action="edit"]');
+  editButton.dataset.url = daEditUrl;
+  editButton.setAttribute('aria-label', `Edit ${item.path} in Experience Workspace`);
+  const previewButton = li.querySelector('[data-action="preview"]');
+  previewButton.dataset.url = previewUrl;
+  previewButton.setAttribute('aria-label', `Preview ${item.path}`);
   checkbox.addEventListener('change', (e) => {
     if (e.target.checked) {
       li.classList.add('selected');
@@ -381,8 +396,8 @@ function createResultItem(item) {
   li.querySelectorAll('.result-action-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const url = btn.dataset.url;
-      window.open(url, '_blank');
+      const { url } = btn.dataset;
+      window.open(url, '_blank', 'noopener');
     });
   });
 
@@ -416,6 +431,9 @@ function deselectAll() {
  */
 function renderResults() {
   const { resultsList, resultsSection, emptyState } = elements;
+  const selectedPaths = new Set(
+    [...resultsList.querySelectorAll('.result-checkbox:checked')].map((checkbox) => checkbox.value),
+  );
 
   if (state.results.length === 0) {
     resultsSection.classList.add('hidden');
@@ -432,8 +450,14 @@ function renderResults() {
   const sorted = [...state.results].sort((a, b) => a.lastModified - b.lastModified);
 
   sorted.forEach((item) => {
-    resultsList.appendChild(createResultItem(item));
+    const li = createResultItem(item);
+    if (selectedPaths.has(item.path)) {
+      li.querySelector('.result-checkbox').checked = true;
+      li.classList.add('selected');
+    }
+    resultsList.appendChild(li);
   });
+  updateSelectedCount();
 }
 
 /**
@@ -488,10 +512,24 @@ function exportCSV(selectedOnly = false) {
  * Starts the scan process
  */
 async function startScan() {
-  const { startPath, monthsThreshold, scanBtn, cancelBtn, progressSection, stats, emptyState } = elements;
+  if (state.scanning) return;
+  const {
+    startPath, monthsThreshold, scanBtn, cancelBtn, progressSection, stats, emptyState,
+  } = elements;
 
   const path = startPath.value.trim() || '/';
-  const threshold = parseInt(monthsThreshold.value, 10) || 6;
+  const threshold = monthsThreshold.value.trim() === '' ? 6 : Number(monthsThreshold.value);
+  const invalidThreshold = !Number.isInteger(threshold) || threshold < 1 || threshold > 60;
+  monthsThreshold.error = invalidThreshold ? 'Enter a whole number from 1 to 60.' : '';
+  monthsThreshold.setAttribute('aria-invalid', String(invalidThreshold));
+  if (invalidThreshold) {
+    showMessage('Enter a whole number from 1 to 60 months.', 'error');
+    monthsThreshold.focus();
+    return;
+  }
+
+  clearTimeout(messageTimeout);
+  elements.messageWrapper.classList.add('hidden');
 
   // Reset state
   state.scanning = true;
@@ -500,12 +538,15 @@ async function startScan() {
   state.totalScanned = 0;
 
   // Update UI
-  scanBtn.disabled = true;
+  scanBtn.setAttribute('disabled', '');
   cancelBtn.classList.remove('hidden');
   progressSection.classList.remove('hidden');
   stats.classList.remove('hidden');
   emptyState.classList.add('hidden');
   elements.resultsSection.classList.add('hidden');
+  elements.resultsSection.setAttribute('aria-busy', 'true');
+  elements.resultsList.replaceChildren();
+  updateSelectedCount();
 
   updateProgress('Starting scan...', 0);
   updateStats();
@@ -530,9 +571,10 @@ async function startScan() {
     showMessage(error.message, 'error');
   } finally {
     state.scanning = false;
-    scanBtn.disabled = false;
+    scanBtn.removeAttribute('disabled');
     cancelBtn.classList.add('hidden');
     progressSection.classList.add('hidden');
+    elements.resultsSection.setAttribute('aria-busy', 'false');
     updateProgress('Scan complete', 100);
   }
 }
@@ -582,6 +624,7 @@ function initElements() {
     selectedCount: document.getElementById('selected-count'),
     progressSection: document.getElementById('progress-section'),
     progressFill: document.getElementById('progress-fill'),
+    progressBar: document.getElementById('progress-bar'),
     progressText: document.getElementById('progress-text'),
     stats: document.getElementById('stats'),
     totalScanned: document.getElementById('total-scanned'),
@@ -603,18 +646,31 @@ function initElements() {
   let context;
   let token;
 
-  if (isStandalone()) {
-    // eslint-disable-next-line no-console
-    console.log('Stale Content Finder running in standalone mode (testing)');
-    context = mockContext;
-    token = mockToken;
+  try {
+    await import('https://da.live/nx/public/sl/components.js');
+    await Promise.all([
+      customElements.whenDefined('sl-input'),
+      customElements.whenDefined('sl-button'),
+    ]);
+    if (isStandalone()) {
+      // eslint-disable-next-line no-console
+      console.log('Stale Content Finder running in standalone mode (testing)');
+      context = mockContext;
+      token = mockToken;
 
-    // Show a notice in standalone mode
-    showMessage('Running in test mode - connect to DA for real data');
-  } else {
-    const sdk = await DA_SDK;
-    context = sdk.context;
-    token = sdk.token;
+      // Show a notice in standalone mode
+      showMessage('Running in test mode - connect to Experience Workspace for real data');
+    } else {
+      const { default: sdk } = await import('https://da.live/nx/utils/sdk.js');
+      ({ context, token } = await sdk);
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Stale Content Finder could not initialize the SDK', error);
+    showMessage('Could not load the Experience Workspace SDK. Please reload the app.', 'error');
+    return;
+  } finally {
+    document.body.classList.remove('sl-loading');
   }
 
   // Store context in state
@@ -629,12 +685,19 @@ function initElements() {
   elements.exportSelectedBtn.addEventListener('click', () => exportCSV(true));
   elements.selectAllBtn.addEventListener('click', selectAll);
   elements.deselectAllBtn.addEventListener('click', deselectAll);
+  elements.scanBtn.removeAttribute('disabled');
 
   // Allow pressing Enter in inputs to start scan
   elements.startPath.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !state.scanning) startScan();
+    if (e.key === 'Enter' && !state.scanning) {
+      e.preventDefault();
+      startScan();
+    }
   });
   elements.monthsThreshold.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !state.scanning) startScan();
+    if (e.key === 'Enter' && !state.scanning) {
+      e.preventDefault();
+      startScan();
+    }
   });
 }());
