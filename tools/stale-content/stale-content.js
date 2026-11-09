@@ -19,7 +19,8 @@ const ICONS = {
  * Application state
  */
 const state = {
-  token: null,
+  daFetch: null,
+  cancelCrawl: null,
   org: null,
   site: null,
   scanning: false,
@@ -33,6 +34,9 @@ const state = {
  */
 let elements = {};
 let messageTimeout;
+
+const LOCATION_STORAGE_KEY = 'stale-content-location';
+const LOCATION_NAME_PATTERN = /^[a-z0-9][a-z0-9._-]*$/i;
 
 /**
  * Shows a feedback message
@@ -79,6 +83,42 @@ function updateStats() {
   const { totalScanned, staleCount } = elements;
   totalScanned.textContent = state.totalScanned.toLocaleString();
   staleCount.textContent = state.results.length.toLocaleString();
+}
+
+function getInitialLocation(context) {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('org') || params.has('site')) {
+    return { org: params.get('org') || '', site: params.get('site') || '' };
+  }
+  if (context?.org || context?.repo || context?.site) {
+    return { org: context.org || '', site: context.repo || context.site || '' };
+  }
+  try {
+    const [org = '', site = ''] = (localStorage.getItem(LOCATION_STORAGE_KEY) || '').split('/');
+    return { org, site };
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn('Could not read the last Stale Content Finder location', error);
+    return { org: '', site: '' };
+  }
+}
+
+function rememberLocation(org, site) {
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set('org', org);
+    url.searchParams.set('site', site);
+    window.history.replaceState(null, '', url);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn('Could not update the Stale Content Finder URL', error);
+  }
+  try {
+    localStorage.setItem(LOCATION_STORAGE_KEY, `${org}/${site}`);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn('Could not remember the Stale Content Finder location', error);
+  }
 }
 
 /**
@@ -133,21 +173,20 @@ function parseDate(dateStr) {
  * @returns {Promise<Object|null>} Metadata object or null
  */
 async function fetchPageMetadata(path) {
-  const { org, site, token } = state;
+  const { org, site, daFetch } = state;
   // Remove the org/site prefix if present
   const cleanPath = path.replace(`/${org}/${site}`, '');
   const url = `https://admin.da.live/source/${org}/${site}${cleanPath}.html`;
 
   try {
-    const resp = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const resp = await daFetch(url);
 
     if (!resp.ok) {
-      console.warn(`[Stale Content] Failed to fetch ${url}: ${resp.status}`);
-      return null;
+      if (resp.status === 404) {
+        console.warn(`[Stale Content] Page not found: ${cleanPath}`);
+        return null;
+      }
+      throw new Error(`Could not read ${cleanPath} (HTTP ${resp.status}). Check your Experience Workspace access.`);
     }
 
     const html = await resp.text();
@@ -193,7 +232,7 @@ async function fetchPageMetadata(path) {
     return metadata;
   } catch (error) {
     console.error(`Error fetching metadata for ${path}:`, error);
-    return null;
+    throw error;
   }
 }
 
@@ -217,12 +256,15 @@ function collectPage(item, pages) {
 async function processPage(item, thresholdMonths) {
   if (state.cancelled) return;
 
+  const prefix = `/${state.org}/${state.site}`;
+  const path = item.path.startsWith(`${prefix}/`) ? item.path.slice(prefix.length) : item.path;
+
   state.totalScanned += 1;
   updateProgress(`Checking metadata: ${item.path}`, null);
   updateStats();
 
   // Fetch the page metadata
-  const metadata = await fetchPageMetadata(item.path.replace('.html', ''));
+  const metadata = await fetchPageMetadata(path.replace(/\.html$/, ''));
 
   if (!metadata) return;
 
@@ -253,12 +295,12 @@ async function processPage(item, thresholdMonths) {
   const months = monthsAgo(lastModifiedDate);
   if (months >= thresholdMonths) {
     // Extract name from path
-    const pathParts = item.path.split('/');
+    const pathParts = path.split('/');
     const fileName = pathParts[pathParts.length - 1];
     const name = fileName.replace('.html', '');
 
     state.results.push({
-      path: item.path.replace('.html', ''),
+      path: path.replace(/\.html$/, ''),
       name,
       ext: 'html',
       lastModified: lastModifiedDate.getTime(),
@@ -284,13 +326,25 @@ async function scanContent(startPath, thresholdMonths) {
   const pages = [];
 
   try {
+    const response = await state.daFetch(`https://admin.da.live/list${path}`);
+    if (!response.ok) {
+      throw new Error(`Could not access ${org}/${site}${startPath === '/' ? '' : startPath} (HTTP ${response.status}). Check the location and your Experience Workspace access.`);
+    }
+    if (!Array.isArray(await response.json())) {
+      throw new Error(`Invalid content listing for ${org}/${site}. Please try again.`);
+    }
+    if (state.cancelled) return;
+    rememberLocation(org, site);
+
     const { crawl } = await import('https://da.live/nx/public/utils/tree.js');
+    if (state.cancelled) return;
     // First, crawl to discover all pages
-    const { results } = crawl({
+    const { results, cancelCrawl } = crawl({
       path,
       callback: (item) => collectPage(item, pages),
       concurrent: 20,
     });
+    state.cancelCrawl = cancelCrawl;
 
     await results;
 
@@ -303,7 +357,11 @@ async function scanContent(startPath, thresholdMonths) {
       if (state.cancelled) break;
 
       const batch = pages.slice(i, i + batchSize);
-      await Promise.all(batch.map((page) => processPage(page, thresholdMonths)));
+      const outcomes = await Promise.allSettled(
+        batch.map((page) => processPage(page, thresholdMonths)),
+      );
+      const failure = outcomes.find((outcome) => outcome.status === 'rejected');
+      if (failure) throw failure.reason;
 
       const progress = Math.round(((i + batch.length) / pages.length) * 100);
       updateProgress(`Checking metadata: ${i + batch.length}/${pages.length}`, progress);
@@ -333,6 +391,25 @@ function updateSelectedCount() {
     selectedCount.textContent = '';
     exportSelectedBtn.classList.add('hidden');
   }
+}
+
+function clearResults() {
+  state.results = [];
+  state.totalScanned = 0;
+  elements.resultsList.replaceChildren();
+  elements.resultsSection.classList.add('hidden');
+  elements.stats.classList.add('hidden');
+  elements.emptyState.classList.remove('hidden');
+  elements.emptyState.querySelector('p').textContent = 'Click "Scan for Stale Content" to find content that hasn\'t been updated recently.';
+  updateSelectedCount();
+  updateStats();
+}
+
+function handleLocationInput() {
+  if (state.scanning) return;
+  clearResults();
+  clearTimeout(messageTimeout);
+  elements.messageWrapper.classList.add('hidden');
 }
 
 /**
@@ -513,10 +590,32 @@ function exportCSV(selectedOnly = false) {
 async function startScan() {
   if (state.scanning) return;
   const {
-    startPath, monthsThreshold, scanBtn, cancelBtn, progressSection, stats, emptyState,
+    orgInput, siteInput, startPath, monthsThreshold, scanBtn, cancelBtn,
+    progressSection, stats, emptyState,
   } = elements;
 
-  const path = startPath.value.trim() || '/';
+  const org = (orgInput.value || '').trim();
+  const site = (siteInput.value || '').trim();
+  const invalidLocation = [orgInput, siteInput].filter((input) => {
+    const value = (input.value || '').trim();
+    input.error = LOCATION_NAME_PATTERN.test(value)
+      ? ''
+      : 'Enter a name starting with a letter or number, using only letters, numbers, dots, hyphens, or underscores.';
+    input.setAttribute('aria-invalid', String(Boolean(input.error)));
+    return Boolean(input.error);
+  });
+  if (invalidLocation.length > 0) {
+    showMessage('Enter a valid organization and site, not a URL or path.', 'error');
+    invalidLocation[0].focus();
+    return;
+  }
+  if (!state.daFetch) {
+    showMessage('Open this app in Experience Workspace to sign in and scan.', 'error');
+    return;
+  }
+
+  const pathValue = startPath.value.trim() || '/';
+  const path = pathValue.startsWith('/') ? pathValue : `/${pathValue}`;
   const threshold = monthsThreshold.value.trim() === '' ? 6 : Number(monthsThreshold.value);
   const invalidThreshold = !Number.isInteger(threshold) || threshold < 1 || threshold > 60;
   monthsThreshold.error = invalidThreshold ? 'Enter a whole number from 1 to 60.' : '';
@@ -533,8 +632,12 @@ async function startScan() {
   // Reset state
   state.scanning = true;
   state.cancelled = false;
-  state.results = [];
-  state.totalScanned = 0;
+  state.org = org;
+  state.site = site;
+  orgInput.value = org;
+  siteInput.value = site;
+  elements.locationFields.inert = true;
+  clearResults();
 
   // Update UI
   scanBtn.setAttribute('disabled', '');
@@ -570,6 +673,8 @@ async function startScan() {
     showMessage(error.message, 'error');
   } finally {
     state.scanning = false;
+    state.cancelCrawl = null;
+    elements.locationFields.inert = false;
     scanBtn.removeAttribute('disabled');
     cancelBtn.classList.add('hidden');
     progressSection.classList.add('hidden');
@@ -583,6 +688,7 @@ async function startScan() {
  */
 function cancelScan() {
   state.cancelled = true;
+  state.cancelCrawl?.();
   updateProgress('Cancelling...', null);
 }
 
@@ -595,23 +701,14 @@ function isStandalone() {
 }
 
 /**
- * Mock context for standalone testing
- */
-const mockContext = {
-  org: 'test-org',
-  site: 'test-site',
-};
-
-/**
- * Mock token for standalone testing
- */
-const mockToken = 'mock-token';
-
-/**
  * Initialize DOM element references
  */
 function initElements() {
   elements = {
+    orgInput: document.getElementById('org-input'),
+    siteInput: document.getElementById('site-input'),
+    locationFields: document.getElementById('location-fields'),
+    locationStatus: document.getElementById('location-status'),
     startPath: document.getElementById('start-path'),
     monthsThreshold: document.getElementById('months-threshold'),
     scanBtn: document.getElementById('scan-btn'),
@@ -642,40 +739,39 @@ function initElements() {
 (async function init() {
   initElements();
 
-  let context;
-  let token;
-
   try {
-    await import('https://da.live/nx/public/sl/components.js');
+    const [{ default: sdk }] = await Promise.all([
+      import('https://da.live/nx/utils/sdk.js'),
+      import('https://da.live/nx/public/sl/components.js'),
+    ]);
     await Promise.all([
       customElements.whenDefined('sl-input'),
       customElements.whenDefined('sl-button'),
     ]);
-    if (isStandalone()) {
-      // eslint-disable-next-line no-console
-      console.log('Stale Content Finder running in standalone mode (testing)');
-      context = mockContext;
-      token = mockToken;
-
-      // Show a notice in standalone mode
-      showMessage('Running in test mode - connect to Experience Workspace for real data');
-    } else {
-      const { default: sdk } = await import('https://da.live/nx/utils/sdk.js');
-      ({ context, token } = await sdk);
+    let context;
+    if (!isStandalone()) {
+      const connection = await sdk;
+      if (!connection.token || typeof connection.actions?.daFetch !== 'function') {
+        throw new Error('Sign in to Experience Workspace and reload the app to scan content.');
+      }
+      ({ context } = connection);
+      state.daFetch = connection.actions.daFetch;
     }
+    const location = getInitialLocation(context);
+    elements.orgInput.value = location.org;
+    elements.siteInput.value = location.site;
+    elements.locationStatus.textContent = state.daFetch
+      ? 'Scans use your Experience Workspace permissions.'
+      : 'Preview only. Open this app in Experience Workspace to sign in and scan.';
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Stale Content Finder could not initialize the SDK', error);
-    showMessage('Could not load the Experience Workspace SDK. Please reload the app.', 'error');
+    elements.locationStatus.textContent = 'Connection unavailable. Open the app in Experience Workspace and reload.';
+    showMessage(`Could not initialize Experience Workspace: ${error.message}`, 'error');
     return;
   } finally {
     document.body.classList.remove('sl-loading');
   }
-
-  // Store context in state
-  state.org = context.org;
-  state.site = context.repo || context.site;
-  state.token = token;
 
   // Set up event listeners
   elements.scanBtn.addEventListener('click', startScan);
@@ -684,19 +780,18 @@ function initElements() {
   elements.exportSelectedBtn.addEventListener('click', () => exportCSV(true));
   elements.selectAllBtn.addEventListener('click', selectAll);
   elements.deselectAllBtn.addEventListener('click', deselectAll);
-  elements.scanBtn.removeAttribute('disabled');
+  elements.scanBtn.toggleAttribute('disabled', !state.daFetch);
+  elements.orgInput.addEventListener('input', handleLocationInput);
+  elements.siteInput.addEventListener('input', handleLocationInput);
 
   // Allow pressing Enter in inputs to start scan
-  elements.startPath.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !state.scanning) {
-      e.preventDefault();
-      startScan();
-    }
-  });
-  elements.monthsThreshold.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !state.scanning) {
-      e.preventDefault();
-      startScan();
-    }
-  });
+  [elements.orgInput, elements.siteInput, elements.startPath, elements.monthsThreshold]
+    .forEach((input) => {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !state.scanning) {
+          e.preventDefault();
+          startScan();
+        }
+      });
+    });
 }());

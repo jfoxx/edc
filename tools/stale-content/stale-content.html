@@ -15,6 +15,15 @@
     </header>
 
     <div class="controls">
+      <div class="location-fields" id="location-fields">
+        <div class="control-row">
+          <sl-input type="text" id="org-input" name="org-input" label="Organization" autocomplete="off" required></sl-input>
+        </div>
+        <div class="control-row">
+          <sl-input type="text" id="site-input" name="site-input" label="Site" autocomplete="off" required></sl-input>
+        </div>
+        <p class="location-status" id="location-status" role="status">Connecting to Experience Workspace...</p>
+      </div>
       <div class="control-row">
         <sl-input type="text" id="start-path" name="start-path" label="Starting Path" placeholder="/" value="/"></sl-input>
       </div>

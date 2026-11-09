@@ -74,6 +74,20 @@
   min-width: 0;
 }
 
+.location-fields {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 20px;
+  min-width: 0;
+}
+
+.location-status {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--s2-gray-700, #505050);
+  font-size: 13px;
+}
+
 .control-row.buttons,
 .results-actions,
 .result-actions {
@@ -346,6 +360,10 @@
 
   .controls {
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+
+  .location-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .control-row.buttons {
